@@ -135,4 +135,4 @@ bindkey '^[e' autosuggest-accept
 export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=$(command -v python3)
 export VIRTUALENVWRAPPER_VIRTUALENV=$(command -v virtualenv)
-source $HOME/.local/share/pipx/venvs/virtualenvwrapper/bin/virtualenvwrapper.sh
+source $(command -v virtualenvwrapper.sh)
