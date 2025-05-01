@@ -1,0 +1,15 @@
+[Desktop Entry]
+DefaultProfile=Bill.profile
+
+[General]
+ConfigVersion=1
+
+[MainWindow]
+State[$d]
+ToolBarsMovable=Disabled
+
+[SplitView]
+SplitViewVisibility=AlwaysHideSplitHeader
+
+[UiSettings]
+ColorScheme=
