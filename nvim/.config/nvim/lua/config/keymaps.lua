@@ -1,0 +1,94 @@
+-- Telescope keymaps
+vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find files" })
+vim.keymap.set("n", "<leader>gr", "<cmd>Telescope live_grep<CR>", { desc = "Grep in files" })
+vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "List open buffers" })
+vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Help tags" })
+
+-- Example: close buffer
+vim.keymap.set("n", "<leader>q", "<cmd>bd<CR>", { desc = "Close buffer" })
+
+-- Fast access to config files
+vim.keymap.set("n", "<leader>ei", "<cmd>edit ~/.config/nvim/init.lua<CR>", { desc = "Edit init.lua" })
+vim.keymap.set("n", "<leader>ep", "<cmd>edit ~/.config/nvim/lua/plugins/init.lua<CR>", { desc = "Edit plugins/init.lua" })
+vim.keymap.set("n", "<leader>ek", "<cmd>edit ~/.config/nvim/lua/config/keymaps.lua<CR>", { desc = "Edit keymaps.lua" })
+vim.keymap.set("n", "<leader>et", "<cmd>edit ~/.config/nvim/lua/config/treesitter.lua<CR>", { desc = "Edit treesitter.lua" })
+vim.keymap.set("n", "<leader>el", "<cmd>edit ~/.config/nvim/lua/config/lazy.lua<CR>", { desc = "Edit lazy.lua" })
+vim.keymap.set("n", "<leader>ec", "<cmd>edit ~/.config/nvim/lua/config/commands.lua<CR>", { desc = "Edit commands.lua" })
+
+-- From terminal mode, make <C-w> behave like it does in normal mode
+vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], { noremap = true })
+
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP Rename" })
+
+vim.api.nvim_create_user_command("TSKeymaps", function()
+  vim.print(require("nvim-treesitter.configs").get_module("textobjects.select").keymaps)
+end, {})
+
+vim.keymap.set("n", "gd", vim.lsp.buf.declaration, { desc = "Go to declaration", noremap=true, silent=true,})
+vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
+vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
+
+vim.keymap.set("n", "gs", function()
+  local params = { uri = vim.uri_from_bufnr(0) }
+
+  for _, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    if client.name == "clangd" and client:supports_method("textDocument/switchSourceHeader") then
+      client:request("textDocument/switchSourceHeader", params, function(err, result)
+        if result then
+          vim.cmd("edit " .. vim.uri_to_fname(result))
+        else
+          vim.notify("No corresponding source/header file found", vim.log.levels.WARN)
+        end
+      end, 0)
+      return
+    end
+  end
+
+  vim.notify("Clangd is not active or doesn't support header/source switching", vim.log.levels.WARN)
+end, { desc = "Switch between header/source" })
+
+vim.keymap.set("n", "gds", function()
+    local params = vim.lsp.util.make_position_params()
+
+    local function open_location(result)
+        if not result or vim.tbl_isempty(result) then
+            vim.notify("No definition found", vim.log.levels.WARN)
+            return
+        end
+
+        local location = result[1] or result
+        local uri = location.uri or location.targetUri
+        local filename = vim.uri_to_fname(uri)
+        local bufnr = vim.fn.bufnr(filename)
+
+        -- Check if buffer is already visible in a window
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+            if vim.api.nvim_win_get_buf(win) == bufnr then
+                vim.api.nvim_set_current_win(win)
+                vim.lsp.util.jump_to_location(location, "utf-8")
+                return
+            end
+        end
+
+        -- Not visible → open in split
+        vim.cmd("vsplit " .. filename)
+        vim.lsp.util.jump_to_location(location, "utf-8")
+    end
+
+    -- Request definition and apply logic
+    for _, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+        if client:supports_method("textDocument/definition") then
+            client:request("textDocument/definition", params, function(err, result)
+                if err then
+                    vim.notify("LSP error: " .. err.message, vim.log.levels.ERROR)
+                    return
+                end
+                open_location(result)
+            end, 0)
+            return
+        end
+    end
+
+    vim.notify("LSP client does not support textDocument/definition", vim.log.levels.WARN)
+end, { desc = "Go to definition (smart split)" })
+
