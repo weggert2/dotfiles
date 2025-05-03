@@ -1,0 +1,27 @@
+[user]
+    name = Bill Eggert
+
+[include]
+    path = ~/.gitconfig.local
+
+[alias]
+    unpushed = "!GIT_CURRENT_BRANCH=$(git name-rev --name-only HEAD) && git log origin/$GIT_CURRENT_BRANCH..$GIT_CURRENT_BRANCH --oneline 2>/dev/null"
+    pf = "!GIT_CURRENT_BRANCH=$(git name-rev --name-only HEAD) && git add . && git commit --amend --no-edit && git push origin $GIT_CURRENT_BRANCH -f"
+    po = "!GIT_CURRENT_BRANCH=$(git name-rev --name-only HEAD) && git push origin $GIT_CURRENT_BRANCH"
+    pl = "!GIT_CURRENT_BRANCH=$(git name-rev --name-only HEAD) && git pull origin $GIT_CURRENT_BRANCH"
+    reset-date = commit --amend --date=now --no-edit
+    su = submodule update --init --recursive
+    c- = checkout -
+    rb = pull origin dev --rebase
+    recent = "!git --no-pager log --oneline -n 10"
+    created = log --diff-filter=A --follow --format=%aD -1 --
+
+[push]
+    followTags = true
+
+[core]
+    editor = vim
+
+[init]
+    defaultBranch = main
+
