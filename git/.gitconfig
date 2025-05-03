@@ -9,6 +9,8 @@
     pf = "!GIT_CURRENT_BRANCH=$(git name-rev --name-only HEAD) && git add . && git commit --amend --no-edit && git push origin $GIT_CURRENT_BRANCH -f"
     po = "!GIT_CURRENT_BRANCH=$(git name-rev --name-only HEAD) && git push origin $GIT_CURRENT_BRANCH"
     pl = "!GIT_CURRENT_BRANCH=$(git name-rev --name-only HEAD) && git pull origin $GIT_CURRENT_BRANCH"
+    cm = "!git checkout $(git-default-branch)"
+    rb = "!git pull origin $(git-default-branch) --rebase"
     reset-date = commit --amend --date=now --no-edit
     su = submodule update --init --recursive
     c- = checkout -

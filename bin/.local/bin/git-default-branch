@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null)
+if [ -n "$ref" ]; then
+    echo "${ref##refs/remotes/origin/}"
+else
+    git remote show origin | awk '/HEAD branch/ {print $NF}'
+fi
+
