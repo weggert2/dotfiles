@@ -18,8 +18,27 @@ vim.keymap.set("n", "<leader>ec", "<cmd>edit ~/.config/nvim/lua/config/commands.
 -- From terminal mode, make <C-w> behave like it does in normal mode
 vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], { noremap = true })
 
-vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "LSP Rename" })
+-- Quickfix
+vim.keymap.set("n", "<leader>co", function()
+    vim.cmd("botright vertical copen")
+    vim.cmd("vertical resize 140")
+    vim.cmd("cfirst")
+    vim.cmd("cnext")
+end, { desc = "Open quickfix list in right split, resized, and jump to first error" })
 
+vim.keymap.set("n", "<leader>cn", function()
+    local ok, err = pcall(vim.cmd, "cnext")
+    if not ok then
+        vim.notify("No more (next) errors", vim.log.levels.INFO)
+    end
+end, { desc = "Next quickfix item" })
+
+vim.keymap.set("n", "<leader>cn", function()
+    local ok, err = pcall(vim.cmd, "cnext")
+    if not ok then
+        vim.notify("No more (next) errors", vim.log.levels.INFO)
+    end
+end, { desc = "Next quickfix item" })
 vim.api.nvim_create_user_command("TSKeymaps", function()
   vim.print(require("nvim-treesitter.configs").get_module("textobjects.select").keymaps)
 end, {})
@@ -29,23 +48,25 @@ vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementa
 vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
 
 vim.keymap.set("n", "gs", function()
-  local params = { uri = vim.uri_from_bufnr(0) }
+    local params = { uri = vim.uri_from_bufnr(0) }
 
-  for _, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
-    if client.name == "clangd" and client:supports_method("textDocument/switchSourceHeader") then
-      client:request("textDocument/switchSourceHeader", params, function(err, result)
-        if result then
-          vim.cmd("edit " .. vim.uri_to_fname(result))
-        else
-          vim.notify("No corresponding source/header file found", vim.log.levels.WARN)
+    for _, client in pairs(vim.lsp.get_clients({ bufnr = 0 })) do
+        if client.name == "clangd" and client:supports_method("textDocument/switchSourceHeader") then
+            client:request("textDocument/switchSourceHeader", params, function(err, result)
+                if result then
+                    vim.cmd("edit " .. vim.uri_to_fname(result))
+                else
+                    vim.notify("No corresponding source/header file found", vim.log.levels.WARN)
+                end
+            end, 0)
+            return
         end
-      end, 0)
-      return
     end
-  end
 
-  vim.notify("Clangd is not active or doesn't support header/source switching", vim.log.levels.WARN)
+    vim.notify("Clangd is not active or doesn't support header/source switching", vim.log.levels.WARN)
 end, { desc = "Switch between header/source" })
+
+vim.keymap.set("n", "gm", "50%zz", { desc = "Jump to middle of file"})
 
 vim.keymap.set("n", "gds", function()
     local params = vim.lsp.util.make_position_params()

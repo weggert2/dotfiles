@@ -35,6 +35,8 @@ require("nvim-treesitter.configs").setup({
                 ["iC"] = "@conditional.inner",
                 ["al"] = "@loop.outer",
                 ["il"] = "@loop.inner",
+                ["aC"] = "@call.outer",
+                ["iC"] = "@call.inner",
             },
         },
         move = {
@@ -43,12 +45,14 @@ require("nvim-treesitter.configs").setup({
             disable = { "vim", "make", "query", "bash", "markdown", "gitcommit" },
             goto_next_start = {
                 ["]f"] = "@function.outer",
+                ["]C"] = "@call.outer",
                 ["]c"] = "@class.outer",
                 ["]a"] = "@parameter.inner",
             },
             goto_previous_start = {
                 ["[f"] = "@function.outer",
                 ["[c"] = "@class.outer",
+                ["[C"] = "@call.outer",
                 ["[a"] = "@parameter.inner",
             },
         },

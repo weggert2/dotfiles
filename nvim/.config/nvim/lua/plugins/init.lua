@@ -11,7 +11,14 @@ return {
         tag = "0.1.3",
         dependencies = { "nvim-lua/plenary.nvim" },
         config = function()
-            require("telescope").setup()
+            require("telescope").setup({
+                defaults = {
+                    file_ignore_patterns = {
+                        "build/",
+                        "lcov%-report/",
+                    },
+                },
+            })
         end,
     },
     {
@@ -52,7 +59,7 @@ return {
             cmp.setup({
                 completion = {
                     autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
-                    keyword_length = 4, -- don't trigger until 2 characters typed
+                    keyword_length = 4, -- don't trigger until 4 characters typed
                 },
                 snippet = {
                     expand = function(args)
@@ -141,7 +148,7 @@ return {
     },
     {
         "folke/flash.nvim",
-        event = "VeryLazy",
+        lazy = false,
         ---@type Flash.Config
         opts = {},
         -- stylua: ignore
@@ -164,8 +171,52 @@ return {
         opts = {},
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("oil").setup()
+            require("oil").setup({
+                default_file_explorer = false,
+            })
         end
+    },
+    {
+        "nvim-tree/nvim-tree.lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("nvim-tree").setup({
+                filters = {
+                    dotfiles = false,
+                    custom = { "^.git$", "node_modules", "build" },
+                },
+                git = {
+                    enable = true,
+                },
+                view = {
+                    width = 30,
+                    side = "left",
+                },
+            })
+
+            -- Toggle with <leader>e
+            vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Toggle nvim-tree" })
+        end,
+    },
+    -- {
+    --     "rcarriga/nvim-notify",
+    --     lazy = false, -- load immediately so vim.notify is overridden early
+    --     config = function()
+    --         require("notify").setup({
+    --             stages = "fade_in_slide_out",
+    --             timeout = 3000,
+    --             background_colour = "#000000",
+    --         })
+    --
+    --         -- Override default vim.notify
+    --         vim.notify = require("notify")
+    --     end,
+    -- }
+    {
+        "mg979/vim-visual-multi",
+        branch = "master",
+        init = function()
+            vim.g.VM_default_mappings = true
+        end,
     }
 }
-
