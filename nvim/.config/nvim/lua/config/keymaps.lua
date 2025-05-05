@@ -20,11 +20,33 @@ vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], { noremap = true })
 
 -- Quickfix
 vim.keymap.set("n", "<leader>co", function()
+    local qf_list = vim.fn.getqflist()
+    if vim.tbl_isempty(qf_list) then
+        vim.notify("Quickfix list is empty", vim.log.levels.WARN)
+        return
+    end
+
     vim.cmd("botright vertical copen")
-    vim.cmd("vertical resize 140")
+
+    -- Resize to half the screen width
+    local half_width = math.floor(vim.o.columns / 2)
+    vim.cmd("vertical resize " .. half_width)
+
     vim.cmd("cfirst")
-    vim.cmd("cnext")
-end, { desc = "Open quickfix list in right split, resized, and jump to first error" })
+    if #qf_list > 1 then
+        pcall(vim.cmd, "cnext")
+    end
+end, { desc = "Open quickfix list in right split, resized to 50%, and jump to first error" })
+
+vim.keymap.set("n", "<leader>cc", function()
+    for _, win in ipairs(vim.fn.getwininfo()) do
+        if win.quickfix == 1 then
+            vim.cmd("cclose")
+            return
+        end
+    end
+    vim.notify("Quickfix window is not open", vim.log.levels.INFO)
+end, { desc = "Close quickfix window if open" })
 
 vim.keymap.set("n", "<leader>cn", function()
     local ok, err = pcall(vim.cmd, "cnext")
@@ -33,12 +55,13 @@ vim.keymap.set("n", "<leader>cn", function()
     end
 end, { desc = "Next quickfix item" })
 
-vim.keymap.set("n", "<leader>cn", function()
-    local ok, err = pcall(vim.cmd, "cnext")
+vim.keymap.set("n", "<leader>cp", function()
+    local ok, err = pcall(vim.cmd, "cprev")
     if not ok then
-        vim.notify("No more (next) errors", vim.log.levels.INFO)
+        vim.notify("No more (prev) errors", vim.log.levels.INFO)
     end
-end, { desc = "Next quickfix item" })
+end, { desc = "Prev quickfix item" })
+
 vim.api.nvim_create_user_command("TSKeymaps", function()
   vim.print(require("nvim-treesitter.configs").get_module("textobjects.select").keymaps)
 end, {})

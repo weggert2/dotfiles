@@ -12,3 +12,26 @@ vim.api.nvim_create_autocmd("VimEnter", {
         end
     end,
 })
+
+
+vim.api.nvim_create_autocmd("QuickFixCmdPre", {
+    pattern = "make",
+    callback = function()
+        vim.cmd("write")
+    end,
+})
+
+vim.api.nvim_create_autocmd("QuickFixCmdPost", {
+    pattern = "make",
+    callback = function()
+        if vim.tbl_isempty(vim.fn.getqflist()) then
+            -- No errors, close the quickfix window if it's open
+            for _, win in ipairs(vim.fn.getwininfo()) do
+                if win.quickfix == 1 then
+                    vim.cmd("cclose")
+                    break
+                end
+            end
+        end
+    end,
+})

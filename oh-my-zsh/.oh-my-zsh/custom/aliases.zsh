@@ -23,3 +23,5 @@ teeclip() {
     tee
   fi
 }
+
+alias rm="rm --verbose"
