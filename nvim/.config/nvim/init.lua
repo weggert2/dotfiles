@@ -16,6 +16,16 @@ vim.opt.relativenumber = true   -- Relative line numbers for all others
 vim.opt.smartindent = true
 vim.opt.autoindent = true
 vim.opt.cindent = true
+vim.opt.fixendofline = true
+
+vim.opt.list = true
+vim.opt.listchars = {
+    -- space = "·",     -- dot for space
+    tab = "▸ ",      -- arrow + space for tab
+    trail = "•",     -- bullet for trailing space
+    extends = "⟩",   -- when line overflows right
+    precedes = "⟨",  -- when line overflows left
+}
 
 require("config.keymaps")
 require("config.lazy")
@@ -23,11 +33,24 @@ require("config.commands")
 require("config.autocmds")
 require("config.colors").setup()
 
--- Set :make to run the CMake build step
-vim.opt.makeprg = "cmake --build build --parallel $(nproc)"
+-- Only apply this config for C and C++
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "c", "cpp" },
+    callback = function()
+        -- Set makeprg to run cmake configure + build
+        vim.opt_local.makeprg = table.concat({
+            "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+            "cmake --build build --parallel $(nproc)"
+        }, " && ")
 
--- Set the error format for parsing compiler errors (gcc/clang-style)
-vim.opt.errorformat = "%f:%l:%c: %t%*[^:]: %m"
+        -- Set errorformat for GCC/Clang
+        vim.opt_local.errorformat = table.concat({
+            "%f:%l:%c: %t%*[^:]: %m",  -- with column
+            "%f:%l: %t%*[^:]: %m",     -- without column
+            "%-G%.%#",                 -- ignore everything else
+        }, ",")
+    end,
+})
 
 vim.filetype.add {
     extension = {

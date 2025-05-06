@@ -4,8 +4,8 @@ vim.keymap.set("n", "<leader>gr", "<cmd>Telescope live_grep<CR>", { desc = "Grep
 vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "List open buffers" })
 vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Help tags" })
 
--- Example: close buffer
-vim.keymap.set("n", "<leader>q", "<cmd>bd<CR>", { desc = "Close buffer" })
+-- Example: exit terminal mode
+vim.keymap.set("t", "<C-q>", [[<C-\><C-n>]], { desc = "Exit terminal mode", noremap = true })
 
 -- Fast access to config files
 vim.keymap.set("n", "<leader>ei", "<cmd>edit ~/.config/nvim/init.lua<CR>", { desc = "Edit init.lua" })
@@ -14,9 +14,34 @@ vim.keymap.set("n", "<leader>ek", "<cmd>edit ~/.config/nvim/lua/config/keymaps.l
 vim.keymap.set("n", "<leader>et", "<cmd>edit ~/.config/nvim/lua/config/treesitter.lua<CR>", { desc = "Edit treesitter.lua" })
 vim.keymap.set("n", "<leader>el", "<cmd>edit ~/.config/nvim/lua/config/lazy.lua<CR>", { desc = "Edit lazy.lua" })
 vim.keymap.set("n", "<leader>ec", "<cmd>edit ~/.config/nvim/lua/config/commands.lua<CR>", { desc = "Edit commands.lua" })
+vim.keymap.set("n", "<leader>ea", "<cmd>edit ~/.config/nvim/lua/config/autocmds.lua<CR>", { desc = "Edit autocmds.lua" })
+vim.keymap.set("n", "<leader>er", "<cmd>edit ~/.config/nvim/lua/config/colors.lua<CR>", { desc = "Edit colors.lua" })
 
--- From terminal mode, make <C-w> behave like it does in normal mode
-vim.keymap.set("t", "<C-w>", [[<C-\><C-n><C-w>]], { noremap = true })
+-- Delete without yank (black hole register)
+vim.keymap.set("n", "d", '"_d', { noremap = true })
+vim.keymap.set("n", "dd", '"_dd', { noremap = true })
+vim.keymap.set("n", "D", '"_D', { noremap = true })
+vim.keymap.set("v", "d", '"_d', { noremap = true })
+vim.keymap.set("v", "D", '"_D', { noremap = true })
+
+-- Yank+delete using <leader>
+vim.keymap.set("n", "<leader>d", "d", { noremap = true, desc = "Delete with yank" })
+vim.keymap.set("n", "<leader>dd", "dd", { noremap = true, desc = "Delete line with yank" })
+vim.keymap.set("n", "<leader>D", "D", { noremap = true, desc = "Delete to EOL with yank" })
+vim.keymap.set("v", "<leader>d", "d", { noremap = true, desc = "Delete with yank (visual)" })
+vim.keymap.set("v", "<leader>D", "D", { noremap = true, desc = "Delete to EOL with yank (visual)" })
+
+-- Paste below/above the current line
+vim.keymap.set("n", "<leader>p", function() vim.cmd("put")  end, { desc = "Paste below line" })
+vim.keymap.set("n", "<leader>P", function() vim.cmd("put!") end, { desc = "Paste above line" })
+
+-- Normal mode: move current line up/down without reindenting
+vim.keymap.set("n", "<A-j>", ":m .+1<CR>==", { desc = "Move line down", silent = true })
+vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up", silent = true })
+
+-- Visual mode: move selection and *do not* reindent
+vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { desc = "Move selection down", silent = true })
+vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { desc = "Move selection up", silent = true })
 
 -- Quickfix
 vim.keymap.set("n", "<leader>co", function()
@@ -31,11 +56,10 @@ vim.keymap.set("n", "<leader>co", function()
     -- Resize to half the screen width
     local half_width = math.floor(vim.o.columns / 2)
     vim.cmd("vertical resize " .. half_width)
-
     vim.cmd("cfirst")
-    if #qf_list > 1 then
-        pcall(vim.cmd, "cnext")
-    end
+    -- if #qf_list > 1 then
+    --     pcall(vim.cmd, "cnext")
+    -- end
 end, { desc = "Open quickfix list in right split, resized to 50%, and jump to first error" })
 
 vim.keymap.set("n", "<leader>cc", function()
@@ -62,6 +86,7 @@ vim.keymap.set("n", "<leader>cp", function()
     end
 end, { desc = "Prev quickfix item" })
 
+-- Treesitter keymaps
 vim.api.nvim_create_user_command("TSKeymaps", function()
   vim.print(require("nvim-treesitter.configs").get_module("textobjects.select").keymaps)
 end, {})

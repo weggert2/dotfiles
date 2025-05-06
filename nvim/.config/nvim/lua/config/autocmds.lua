@@ -4,27 +4,90 @@ vim.api.nvim_create_autocmd("BufWritePre", {
     command = [[%s/\s\+$//e]],
 })
 
--- Open nvim-tree when entering a directory
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = {
+        "c", "cpp", "cc", "cxx",
+        "h", "hh", "hpp", "hxx",
+        "objc", "objcpp", "cuda",
+        "tpp", "icc", "inl", "ixx",
+    },
+    callback = function()
+        vim.keymap.set("x", "=", ":'<,'>!clang-format<CR>gv", { buffer = true })
+    end,
+})
+
+-- Project detection + nvim-tree auto-open
 vim.api.nvim_create_autocmd("VimEnter", {
     callback = function()
-        if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
+        local argv = vim.fn.argv()
+        local uv = vim.loop
+
+        -- 1. Auto-open nvim-tree when opening a folder
+        if vim.fn.argc() == 1 and vim.fn.isdirectory(argv[0]) == 1 then
             vim.cmd("NvimTreeToggle")
+        end
+
+        -- 2. Detect what type of project we're in (CMake = C, cargo = Rust, etc)
+        local function exists(path)
+            local stat = uv.fs_stat(path)
+            return stat and stat.type == "file"
+        end
+
+        local function find_project_root(markers)
+            local cwd = vim.fn.getcwd()
+            while cwd do
+                for _, marker in ipairs(markers) do
+                    if exists(cwd .. "/" .. marker) then
+                        return cwd
+                    end
+                end
+                local parent = vim.fn.fnamemodify(cwd, ":h")
+                if parent == cwd then break end
+                cwd = parent
+            end
+        end
+
+        local root = find_project_root({ "CMakeLists.txt" })
+        if root then
+            vim.opt.makeprg = table.concat({
+                "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                "cmake --build build --parallel 12",
+            }, " && ")
+
+            vim.opt.errorformat = table.concat({
+                "%f:%l:%c: %t%*[^:]: %m",
+                "%f:%l: %t%*[^:]: %m",
+                "%-G%.%#",
+            }, ",")
+
+            vim.notify("🛠️ CMake project detected — :make is ready", vim.log.levels.INFO)
         end
     end,
 })
 
+local build_start_time = nil
 
 vim.api.nvim_create_autocmd("QuickFixCmdPre", {
     pattern = "make",
     callback = function()
-        vim.cmd("write")
+        local bt = vim.bo.buftype
+        if bt == "" then  -- only write real file buffers
+            vim.cmd("write")
+        end
+        build_start_time = vim.loop.hrtime()
     end,
 })
 
 vim.api.nvim_create_autocmd("QuickFixCmdPost", {
     pattern = "make",
     callback = function()
-        if vim.tbl_isempty(vim.fn.getqflist()) then
+        local qf_size = vim.fn.getqflist({ size = 0 }).size
+        local elapsed_s = ""
+        if build_start_time then
+            local elapsed_ns = vim.loop.hrtime() - build_start_time
+            elapsed_s = string.format(" in %.2fs", elapsed_ns * 1e-9)
+        end
+        if qf_size == 0 then
             -- No errors, close the quickfix window if it's open
             for _, win in ipairs(vim.fn.getwininfo()) do
                 if win.quickfix == 1 then
@@ -32,6 +95,11 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
                     break
                 end
             end
+            vim.notify("✅ Build succeeded!" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
+        else
+            -- Notify errors.
+            vim.notify("❌ Build failed with " .. qf_size .. " issues" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
         end
     end,
 })
+

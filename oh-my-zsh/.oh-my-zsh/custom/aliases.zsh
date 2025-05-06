@@ -1,8 +1,8 @@
 alias upgrade="sudo aptitude update && sudo aptitude upgrade && sudo snap refresh"
 alias alpha_queue="sudo sysctl -w fs.mqueue.msg_max=256"
 alias fprime_mmap="sudo sysctl vm.mmap_rnd_bits=28"
-alias ac="cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON && ln -sf build/compile_commands.json compile_commands.json"
-alias ab="ac && cmake --build build --parallel 12"
+alias ac="cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+alias ab="ac && cmake --build build --parallel $(nproc)"
 alias at="ab && ctest --test-dir build"
 alias runtest='function _runtest() { make "$1" && (./"$1" || gdb ./"$1") ; }; _runtest'
 alias hash_alpha_bins="cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build --parallel 10 && find build/bin -type f -name '*.bin' | xargs -I {} md5sum {}"

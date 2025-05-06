@@ -136,3 +136,8 @@ export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=$(command -v python3)
 export VIRTUALENVWRAPPER_VIRTUALENV=$(command -v virtualenv)
 source $(command -v virtualenvwrapper.sh)
+
+# NVM setup
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"

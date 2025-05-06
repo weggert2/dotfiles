@@ -117,21 +117,38 @@ return {
     {
         "neovim/nvim-lspconfig",
         config = function()
-            require("lspconfig").clangd.setup({
-                cmd = { "clangd", "--background-index", "--all-scopes-completion" },
-                root_dir = require("lspconfig.util").root_pattern(
-                    "compile_commands.json",
-                    "compile_flags.txt",
-                    ".git"
-                ),
+            local lspconfig = require("lspconfig")
+            local util = require("lspconfig.util")
+
+            -- C/C++ (Clangd)
+            lspconfig.clangd.setup({
+                cmd = {
+                    "clangd",
+                    "--compile-commands-dir=build",
+                    "--background-index",
+                    "--all-scopes-completion",
+                },
+                root_dir = util.root_pattern(".git", "compile_flags.txt"),
             })
-            require("lspconfig").rust_analyzer.setup({})
-            require("lspconfig").cmake.setup({})
-            require("lspconfig").pylsp.setup({})
-            -- Add more LSPs here as needed
+
+            -- Rust
+            lspconfig.rust_analyzer.setup({
+                root_dir = util.root_pattern("Cargo.toml", ".git"),
+            })
+
+            -- Python
+            lspconfig.pylsp.setup({
+                root_dir = util.root_pattern("pyproject.toml", "setup.py", ".git"),
+            })
+
+            -- CMake (if needed)
+            lspconfig.cmake.setup({
+                root_dir = util.root_pattern("CMakeLists.txt", ".git"),
+            })
+
+            -- Add more language servers here as needed
         end,
     },
-
     {
         "lukas-reineke/indent-blankline.nvim",
         main = "ibl",
@@ -142,6 +159,14 @@ return {
         event = "BufReadPre",
     },
     {
+        "lukas-reineke/virt-column.nvim",
+        opts = {
+            virtcolumn = "80, 100",
+            char = "▏",
+            highlight = "IblIndent",
+        },
+    },
+    {
         "numToStr/Comment.nvim",
         opts = {},  -- works out of the box
         lazy = false,
@@ -149,11 +174,9 @@ return {
     {
         "folke/flash.nvim",
         lazy = false,
-        ---@type Flash.Config
         opts = {},
-        -- stylua: ignore
         keys = {
-            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+            { "s", mode = { "n", "x", "o" }, function() require("flash").jump({jump = {pos = "range"}}) end, desc = "Flash" },
             { "fS", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
             { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
             { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
@@ -217,6 +240,13 @@ return {
         branch = "master",
         init = function()
             vim.g.VM_default_mappings = true
+            vim.g.VM_maps = {
+                ["Find Under"] = "<C-d>",
+                ["Find Subword Under"] = "<C-d>",
+                ["Remove Region"] = "<C-u>",
+                ["Skip Region"] = "<C-j>", -- skip current and move to next
+                ["Align"] = "<M-a>",
+            }
         end,
     },
     {
@@ -225,5 +255,31 @@ return {
         config = function()
             require("nvim-surround").setup()
         end
+    },
+    {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
+        config = function()
+            require("copilot").setup({
+                suggestion = {
+                    enabled = true,
+                    auto_trigger = true,
+                    keymap = {
+                        accept = "<Tab>",
+                        accept_word = "<M-f>",
+                        accept_line = "<M-e>",
+                        next = "<M-]>",
+                        prev = "<M-[>",
+                        dismiss = "<C-]>",
+                    },
+                },
+                panel = { enabled = false },
+                filetypes = {
+                    ["*"] = true,
+                },
+            })
+        end,
     }
+,
 }
