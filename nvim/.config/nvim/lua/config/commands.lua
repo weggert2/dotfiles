@@ -71,3 +71,54 @@ vim.api.nvim_create_user_command("Man",
         complete = "shellcmd",
 })
 
+vim.api.nvim_create_user_command("CTest", function()
+  local old_makeprg = vim.o.makeprg
+  local old_errorformat = vim.o.errorformat
+
+  vim.o.makeprg = "ctest --output-on-failure --test-dir build"
+  vim.o.errorformat = table.concat({
+    "%f|%l| %m",      -- matches file|line| Failure
+    "%f:%l: %m",      -- fallback: file:line: message (e.g. from gtest)
+    "%-G%.%#",        -- ignore everything else
+  }, ",")
+
+  vim.cmd("make")
+
+  -- Restore previous make settings
+  vim.o.makeprg = old_makeprg
+  vim.o.errorformat = old_errorformat
+end, {})
+
+
+local find_project_root = require("plenary.path").find_upwards
+
+-- vim.api.nvim_create_user_command("RunTest", function(opts)
+--   local target = opts.args
+--   if target == "" then
+--     vim.notify("❗ Please provide a test target name", vim.log.levels.WARN)
+--     return
+--   end
+--
+--   local root = find_project_root("CMakeLists.txt")
+--   if not root then
+--     vim.notify("❌ Could not find CMake project root", vim.log.levels.ERROR)
+--     return
+--   end
+--
+--   -- Use build/ inside project root
+--   local build_dir = root .. "/build"
+--
+--   -- Terminal buffer at bottom
+--   local term_buf = vim.api.nvim_create_buf(false, true)
+--   vim.cmd("botright 15split")
+--   vim.api.nvim_win_set_buf(0, term_buf)
+--   vim.bo[term_buf].filetype = "log"
+--
+--   -- Launch make and the test binary from inside build/
+--   vim.fn.termopen({ "sh", "-c", string.format("make %s && ./%s", target, target) }, {
+--     cwd = build_dir,
+--   })
+-- end, {
+--   nargs = 1,
+--   complete = "file",
+-- })
