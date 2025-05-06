@@ -125,6 +125,23 @@ rm() {
     return $missing
 }
 
+unalias man 2>/dev/null
+man() {
+    if [[ $# -eq 0 ]]; then
+        echo "usage: man <topic>"
+        return 1
+    fi
+
+    local exists
+    exists=$(/usr/bin/man -w "$@" 2>/dev/null)
+    if [[ -z "$exists" ]]; then
+        echo "No manual entry for: $*"
+        return 1
+    fi
+
+    nvim -c "Man $*"
+}
+
 alias edalias="nvim $ZSH_CUSTOM/aliases.zsh"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

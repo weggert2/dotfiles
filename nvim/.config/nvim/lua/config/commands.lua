@@ -55,3 +55,19 @@ end, {
     complete = "shellcmd",
     desc = "Smart terminal runner with reuse",
 })
+
+vim.api.nvim_del_user_command("Man") -- remove the built-in one
+vim.api.nvim_create_user_command("Man",
+    function(opts)
+        -- Grab the man output and open it in the current buffer
+        local topic = table.concat(opts.fargs, " ")
+        local output = vim.fn.systemlist("man " .. topic .. " | col -b")
+        vim.cmd("enew")
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, output)
+        vim.bo.filetype = "man"
+        vim.bo.modified = false
+    end, {
+        nargs = "+",
+        complete = "shellcmd",
+})
+

@@ -12,6 +12,8 @@ alias vim="nvim"
 alias vi="nvim"
 alias v="nvim"
 alias v.="nvim ."
+alias rm="rm --verbose"
+alias edz="nvim ~/.zshrc"
 
 teeclip() {
   if [ "$XDG_SESSION_TYPE" = "wayland" ] && command -v wl-copy >/dev/null 2>&1; then
@@ -24,4 +26,3 @@ teeclip() {
   fi
 }
 
-alias rm="rm --verbose"

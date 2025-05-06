@@ -103,3 +103,11 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
     end,
 })
 
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "man",
+  callback = function()
+    -- Pressing <CR> on something like accept(2) jumps to that man page
+    vim.keymap.set("n", "<CR>", "<C-]>", { buffer = true, silent = true })
+  end,
+})
+
