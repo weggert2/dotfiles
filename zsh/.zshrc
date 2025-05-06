@@ -150,7 +150,7 @@ bindkey '^[e' autosuggest-accept
 
 # virtualenvwrapper setup
 export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=$(command -v python3)
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export VIRTUALENVWRAPPER_VIRTUALENV=$(command -v virtualenv)
 source $(command -v virtualenvwrapper.sh)
 

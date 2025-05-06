@@ -43,6 +43,18 @@ vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up", silent = t
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { desc = "Move selection down", silent = true })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { desc = "Move selection up", silent = true })
 
+local copilot_enabled = true
+vim.keymap.set("n", "<leader>ct", function()
+    copilot_enabled = not copilot_enabled
+    if copilot_enabled then
+        vim.cmd("Copilot enable")
+        print("Copilot enabled")
+    else
+        vim.cmd("Copilot disable")
+        print("Copilot disabled")
+    end
+end, { noremap = true, silent = true, desc = "Toggle Copilot" })
+
 -- Quickfix
 vim.keymap.set("n", "<leader>co", function()
     local qf_list = vim.fn.getqflist()
@@ -91,9 +103,10 @@ vim.api.nvim_create_user_command("TSKeymaps", function()
   vim.print(require("nvim-treesitter.configs").get_module("textobjects.select").keymaps)
 end, {})
 
-vim.keymap.set("n", "gd", vim.lsp.buf.declaration, { desc = "Go to declaration", noremap=true, silent=true,})
-vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
-vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition", noremap = true, silent = true })
+vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration", noremap = true, silent = true })
+vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation", noremap = true, silent = true })
+vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references", noremap = true, silent = true })
 
 vim.keymap.set("n", "gs", function()
     local params = { uri = vim.uri_from_bufnr(0) }

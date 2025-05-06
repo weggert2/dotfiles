@@ -71,12 +71,13 @@ vim.api.nvim_create_autocmd("QuickFixCmdPre", {
     pattern = "make",
     callback = function()
         local bt = vim.bo.buftype
-        if bt == "" then  -- only write real file buffers
+        if bt == "" and not vim.bo.readonly and vim.bo.modifiable then
             vim.cmd("write")
         end
         build_start_time = vim.loop.hrtime()
     end,
 })
+
 
 vim.api.nvim_create_autocmd("QuickFixCmdPost", {
     pattern = "make",
