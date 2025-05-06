@@ -33,21 +33,52 @@ require("config.commands")
 require("config.autocmds")
 require("config.colors").setup()
 
--- Only apply this config for C and C++
+-- Pick a build system based on whether we have CMake, Make, or nothing
+-- Applies to C/C++
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "c", "cpp" },
+    pattern = {
+        "c", "cpp", "cc", "cxx",
+        "h", "hh", "hpp", "hxx",
+        "objc", "objcpp",
+        "tpp", "ipp", "inl", "ixx"
+    },
     callback = function()
-        -- Set makeprg to run cmake configure + build
-        vim.opt_local.makeprg = table.concat({
-            "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
-            "cmake --build build --parallel $(nproc)"
-        }, " && ")
+        local fname = vim.fn.expand("%:p")
+        local ext = vim.fn.expand("%:e")
+        local output = vim.fn.expand("%:r")
+        local fallback = ""
 
-        -- Set errorformat for GCC/Clang
+        -- Check for CMakeLists.txt
+        local has_cmake = vim.fn.filereadable("CMakeLists.txt") == 1
+
+        -- Check for any common makefile naming
+        local makefiles = { "Makefile", "makefile", "GNUMakefile" }
+        local has_makefile = false
+        for _, f in ipairs(makefiles) do
+            if vim.fn.filereadable(f) == 1 then
+                has_makefile = true
+                break
+            end
+        end
+
+        if has_cmake then
+            fallback = table.concat({
+                "cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON",
+                "cmake --build build --parallel $(nproc)"
+            }, " && ")
+        elseif has_makefile then
+            fallback = "make"
+        else
+            local compiler = (ext == "c") and "gcc" or "g++"
+            fallback = string.format("%s -g %s -o %s", compiler, fname, output)
+        end
+
+        vim.opt_local.makeprg = fallback
+
         vim.opt_local.errorformat = table.concat({
-            "%f:%l:%c: %t%*[^:]: %m",  -- with column
-            "%f:%l: %t%*[^:]: %m",     -- without column
-            "%-G%.%#",                 -- ignore everything else
+            "%f:%l:%c: %t%*[^:]: %m",
+            "%f:%l: %t%*[^:]: %m",
+            "%-G%.%#",
         }, ",")
     end,
 })

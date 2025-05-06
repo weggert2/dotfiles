@@ -9,6 +9,7 @@ require("nvim-treesitter.configs").setup({
         "vim",
         "vimdoc",
         "markdown",
+        "markdown_inline",
         "rust",
         "zig",
         "cmake",
@@ -16,10 +17,10 @@ require("nvim-treesitter.configs").setup({
     },
     highlight = {
         enable = true,
+        additional_vim_regex_highlighting = { "markdown", "markdown_inline" },
     },
     indent = {
         enable = true,
-        -- disable = { "cpp", "c" }, -- use cindent for these
     },
     incremental_selection = {
         enable = true,
