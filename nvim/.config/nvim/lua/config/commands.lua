@@ -75,21 +75,18 @@ vim.api.nvim_create_user_command("Test", function()
     local old_makeprg = vim.o.makeprg
     local old_errorformat = vim.o.errorformat
 
-    -- Set makeprg to your wrapper script that builds and captures test output
+    -- Set makeprg to a script in ~/.local/bin that builds and captures tests
+    -- output. This is because I couldn't figure out how to pipe to an output
+    -- file usig vim lua
     vim.o.makeprg = "ctest-capture-output"
     vim.o.errorformat = table.concat({
         "%f:%l:%c: %t%*[^:]: %m", -- filename:line:col: [type] message
         "%f:%l: %m",              -- filename:line: message (fallback)
     }, ",")
 
-
-    vim.g.skip_quickfix_summary = false
+    -- Run :make which uses makeprg to do the testing
     vim.cmd("make")
-    vim.defer_fn(function()
-        vim.g.skip_quickfix_summary = false
-    end, 100)  -- delay in milliseconds
 
-    -- Parse test output if the file exists
     local filepath = "testresults.txt"
     local f = io.open(filepath, "r")
     if not f then
@@ -110,24 +107,28 @@ vim.api.nvim_create_user_command("Test", function()
     while i <= #lines do
         local line = lines[i]
 
-        -- Look for a RUN line
+        -- Look for a line called "RUN". All tests hae this, including
+        -- failed tests
         if line:match("^%[ RUN      %]") then
             local filename, linenum, msglines = nil, nil, {}
 
-            -- Look ahead for a line like: /path/file.cpp:42: Failure
+            -- If the next line contains "Failure", then the test failed.
             for j = i + 1, math.min(i + 10, #lines) do
+                -- Parse into a format quickfix can understand
                 local f, l = lines[j]:match("^(.-):(%d+): Failure")
                 if f and l then
                     filename = f
                     linenum = tonumber(l)
                     i = j + 1
 
-                    -- Capture the full failure block until we hit [  FAILED  ]
+                    -- Capture output until the FAILED, which will get the whole
+                    -- error message
                     while i <= #lines and not lines[i]:match("^%[  FAILED  %]") do
                         table.insert(msglines, lines[i])
                         i = i + 1
                     end
 
+                    -- Put what we just captured into the quickfix list
                     if filename and linenum and #msglines > 0 then
                         table.insert(qf, {
                             filename = filename,
@@ -145,12 +146,23 @@ vim.api.nvim_create_user_command("Test", function()
         end
     end
 
+    -- Set the whole quickfix list with our local qf, report result
     vim.fn.setqflist(qf, "r")
 
-    -- Restore previous settings
+    if #qf == 0 then
+        vim.notify("✅ All tests passed!", vim.log.levels.INFO, { title = "Test" })
+    else
+        vim.notify("❌ Test suite failed with " .. #qf .. " issue(s)", vim.log.levels.ERROR, { title = "Test" })
+    end
+
+    -- Clean up
+    os.remove("testresults.txt")
+
+    -- Restore settings
     vim.o.makeprg = old_makeprg
     vim.o.errorformat = old_errorformat
 end, {})
+
 
 
 vim.api.nvim_create_user_command("Check", function()

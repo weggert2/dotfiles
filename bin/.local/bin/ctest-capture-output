@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+# Build
+cmake --build build -j "$(nproc)"
+
+# Run the tests and capture output
+ctest --output-on-failure --test-dir build | tee testresults.txt
