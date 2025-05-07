@@ -82,6 +82,11 @@ vim.api.nvim_create_autocmd("QuickFixCmdPre", {
 vim.api.nvim_create_autocmd("QuickFixCmdPost", {
     pattern = "make",
     callback = function()
+        if vim.o.makeprg == "ctest-capture-output" then
+            -- Don't show notifications for ctest
+            return
+        end
+
         local qf_size = vim.fn.getqflist({ size = 0 }).size
         local elapsed_s = ""
         if build_start_time then
@@ -96,10 +101,10 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
                     break
                 end
             end
-            vim.notify("✅ Build succeeded!" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
+            vim.notify("✅ Task succeeded!" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
         else
             -- Notify errors.
-            vim.notify("❌ Build failed with " .. qf_size .. " issues" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
+            vim.notify("❌ Task failed with " .. qf_size .. " issues" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
         end
     end,
 })

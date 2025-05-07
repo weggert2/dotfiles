@@ -71,54 +71,125 @@ vim.api.nvim_create_user_command("Man",
         complete = "shellcmd",
 })
 
-vim.api.nvim_create_user_command("CTest", function()
-  local old_makeprg = vim.o.makeprg
-  local old_errorformat = vim.o.errorformat
+vim.api.nvim_create_user_command("Test", function()
+    local old_makeprg = vim.o.makeprg
+    local old_errorformat = vim.o.errorformat
 
-  vim.o.makeprg = "ctest --output-on-failure --test-dir build"
-  vim.o.errorformat = table.concat({
-    "%f|%l| %m",      -- matches file|line| Failure
-    "%f:%l: %m",      -- fallback: file:line: message (e.g. from gtest)
-    "%-G%.%#",        -- ignore everything else
-  }, ",")
+    -- Set makeprg to your wrapper script that builds and captures test output
+    vim.o.makeprg = "ctest-capture-output"
+    vim.o.errorformat = table.concat({
+        "%f:%l:%c: %t%*[^:]: %m", -- filename:line:col: [type] message
+        "%f:%l: %m",              -- filename:line: message (fallback)
+    }, ",")
 
-  vim.cmd("make")
 
-  -- Restore previous make settings
-  vim.o.makeprg = old_makeprg
-  vim.o.errorformat = old_errorformat
+    vim.g.skip_quickfix_summary = false
+    vim.cmd("make")
+    vim.defer_fn(function()
+        vim.g.skip_quickfix_summary = false
+    end, 100)  -- delay in milliseconds
+
+    -- Parse test output if the file exists
+    local filepath = "testresults.txt"
+    local f = io.open(filepath, "r")
+    if not f then
+        vim.notify("No testresults.txt found", vim.log.levels.ERROR)
+        vim.o.makeprg = old_makeprg
+        vim.o.errorformat = old_errorformat
+        return
+    end
+
+    local qf = {}
+    local lines = {}
+    for line in f:lines() do
+        table.insert(lines, line)
+    end
+    f:close()
+
+    local i = 1
+    while i <= #lines do
+        local line = lines[i]
+
+        -- Look for a RUN line
+        if line:match("^%[ RUN      %]") then
+            local filename, linenum, msglines = nil, nil, {}
+
+            -- Look ahead for a line like: /path/file.cpp:42: Failure
+            for j = i + 1, math.min(i + 10, #lines) do
+                local f, l = lines[j]:match("^(.-):(%d+): Failure")
+                if f and l then
+                    filename = f
+                    linenum = tonumber(l)
+                    i = j + 1
+
+                    -- Capture the full failure block until we hit [  FAILED  ]
+                    while i <= #lines and not lines[i]:match("^%[  FAILED  %]") do
+                        table.insert(msglines, lines[i])
+                        i = i + 1
+                    end
+
+                    if filename and linenum and #msglines > 0 then
+                        table.insert(qf, {
+                            filename = filename,
+                            lnum = linenum,
+                            col = 1,
+                            text = table.concat(msglines, "\n"),
+                            type = "E",
+                        })
+                    end
+                    break
+                end
+            end
+        else
+            i = i + 1
+        end
+    end
+
+    vim.fn.setqflist(qf, "r")
+
+    -- Restore previous settings
+    vim.o.makeprg = old_makeprg
+    vim.o.errorformat = old_errorformat
 end, {})
 
 
-local find_project_root = require("plenary.path").find_upwards
+vim.api.nvim_create_user_command("Check", function()
+    local old_makeprg = vim.o.makeprg
+    vim.o.makeprg = "./scripts/run_cppcheck.sh"
 
--- vim.api.nvim_create_user_command("RunTest", function(opts)
---   local target = opts.args
---   if target == "" then
---     vim.notify("❗ Please provide a test target name", vim.log.levels.WARN)
---     return
---   end
---
---   local root = find_project_root("CMakeLists.txt")
---   if not root then
---     vim.notify("❌ Could not find CMake project root", vim.log.levels.ERROR)
---     return
---   end
---
---   -- Use build/ inside project root
---   local build_dir = root .. "/build"
---
---   -- Terminal buffer at bottom
---   local term_buf = vim.api.nvim_create_buf(false, true)
---   vim.cmd("botright 15split")
---   vim.api.nvim_win_set_buf(0, term_buf)
---   vim.bo[term_buf].filetype = "log"
---
---   -- Launch make and the test binary from inside build/
---   vim.fn.termopen({ "sh", "-c", string.format("make %s && ./%s", target, target) }, {
---     cwd = build_dir,
---   })
--- end, {
---   nargs = 1,
---   complete = "file",
--- })
+    vim.cmd("make")
+    local exit_code = vim.v.shell_error
+
+    if exit_code == 0 then
+        -- No issues found.
+        vim.o.makeprg = old_makeprg
+        return
+    end
+
+    local filepath = "allcppchecks.txt"
+    local f = io.open(filepath, "r")
+    if not f then
+        vim.notify("Cppcheck output file not found", vim.log.levels.ERROR)
+        vim.o.makeprg = old_makeprg
+        return
+    end
+
+    local qf = {}
+    for line in f:lines() do
+        local file, lnum, col, msg = line:match("^(.-):(%d+):(%d+):%s*[^:]+:%s*(.+)%s+%[.-%]$")
+        if file and lnum and col and msg then
+            table.insert(qf, {
+                filename = file,
+                lnum = tonumber(lnum),
+                col = tonumber(col),
+                text = msg,
+                type = "W",
+            })
+        end
+    end
+    f:close()
+    vim.fn.setqflist(qf, "r")
+
+    vim.o.makeprg = old_makeprg
+end, {})
+
