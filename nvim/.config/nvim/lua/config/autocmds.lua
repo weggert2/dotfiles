@@ -125,3 +125,11 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- Auto save on focus lost or buffer leave
+vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
+    callback = function()
+        if vim.bo.modified and vim.bo.buftype == "" then
+            vim.cmd("silent! write")
+        end
+    end,
+})

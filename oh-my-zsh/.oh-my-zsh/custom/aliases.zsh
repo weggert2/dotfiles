@@ -1,4 +1,4 @@
-alias upgrade="sudo aptitude update && sudo aptitude upgrade && sudo snap refresh"
+alias upgrade="sudo aptitude update && sudo aptitude upgrade && sudo snap refresh && cargo install-update -a"
 alias alpha_queue="sudo sysctl -w fs.mqueue.msg_max=256"
 alias fprime_mmap="sudo sysctl vm.mmap_rnd_bits=28"
 alias ac="cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
@@ -14,6 +14,7 @@ alias v="nvim"
 alias v.="nvim ."
 alias rm="rm --verbose"
 alias edz="nvim ~/.zshrc"
+alias gdb="gdb -tui --args"
 
 teeclip() {
   if [ "$XDG_SESSION_TYPE" = "wayland" ] && command -v wl-copy >/dev/null 2>&1; then

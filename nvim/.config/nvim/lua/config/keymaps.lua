@@ -31,6 +31,12 @@ vim.keymap.set("n", "<leader>D", "D", { noremap = true, desc = "Delete to EOL wi
 vim.keymap.set("v", "<leader>d", "d", { noremap = true, desc = "Delete with yank (visual)" })
 vim.keymap.set("v", "<leader>D", "D", { noremap = true, desc = "Delete to EOL with yank (visual)" })
 
+-- git-conflict
+vim.keymap.set("n", "<leader>ac", "<cmd>GitConflictChooseOurs<CR>", { desc = "Accept Current", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>ai", "<cmd>GitConflictChooseTheirs<CR>", { desc = "Accept Incoming", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>ab", "<cmd>GitConflictChooseBoth<CR>", { desc = "Accept Both", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>aq", "<cmd>GitConflictListQf<CR>", { desc = "List Conflicts (Quickfix)", noremap = true, silent = true })
+
 -- Paste below/above the current line
 vim.keymap.set("n", "<leader>p", function() vim.cmd("put")  end, { desc = "Paste below line" })
 vim.keymap.set("n", "<leader>P", function() vim.cmd("put!") end, { desc = "Paste above line" })
@@ -42,6 +48,10 @@ vim.keymap.set("n", "<A-k>", ":m .-2<CR>==", { desc = "Move line up", silent = t
 -- Visual mode: move selection and *do not* reindent
 vim.keymap.set("v", "<A-j>", ":m '>+1<CR>gv", { desc = "Move selection down", silent = true })
 vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { desc = "Move selection up", silent = true })
+
+-- Page up/down with ctrl+j/k (and center)
+vim.keymap.set("n", "<C-j>", "<C-d>zz", { desc = "Scroll down + center", noremap = true, silent = true })
+vim.keymap.set("n", "<C-k>", "<C-u>zz", { desc = "Scroll up + center", noremap = true, silent = true })
 
 local copilot_enabled = true
 vim.keymap.set("n", "<leader>ct", function()
@@ -107,6 +117,11 @@ vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition", n
 vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration", noremap = true, silent = true })
 vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation", noremap = true, silent = true })
 vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references", noremap = true, silent = true })
+
+vim.keymap.set("n", "Gd", "<cmd>Glance definitions<CR>", { desc = "Glance Definitions", noremap = true, silent = true })
+vim.keymap.set("n", "Gr", "<cmd>Glance references<CR>", { desc = "Glance References", noremap = true, silent = true })
+vim.keymap.set("n", "Gi", "<cmd>Glance implementations<CR>", { desc = "Glance Implementations", noremap = true, silent = true })
+vim.keymap.set("n", "Gt", "<cmd>Glance type_definitions<CR>", { desc = "Glance Type Definitions", noremap = true, silent = true })
 
 vim.keymap.set("n", "gs", function()
     local params = { uri = vim.uri_from_bufnr(0) }

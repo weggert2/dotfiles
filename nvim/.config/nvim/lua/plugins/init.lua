@@ -115,10 +115,41 @@ return {
         end,
     },
     {
+        "williamboman/mason.nvim",
+        config = true,
+    },
+    {
+        "williamboman/mason-lspconfig.nvim",
+        dependencies = { "williamboman/mason.nvim", "neovim/nvim-lspconfig" },
+        config = function()
+            ---@diagnostic disable-next-line
+            require("mason-lspconfig").setup({
+                ensure_installed = {
+                    "lua_ls",
+                    "clangd",
+                    "rust_analyzer",
+                    "pylsp",
+                    "cmake",
+                },
+                automatic_installation = true,
+            })
+        end,
+    },
+    {
+        "folke/neodev.nvim",
+        opts = {}, -- use defaults
+    },
+    {
         "neovim/nvim-lspconfig",
+        dependencies = {
+            { "folke/neodev.nvim", config = true },
+        },
         config = function()
             local lspconfig = require("lspconfig")
             local util = require("lspconfig.util")
+
+            -- Load Neodev first to enhance lua_ls
+            require("neodev").setup({})
 
             -- C/C++ (Clangd)
             lspconfig.clangd.setup({
@@ -128,7 +159,7 @@ return {
                     "--background-index",
                     "--all-scopes-completion",
                 },
-                root_dir = util.root_pattern(".git", "compile_flags.txt"),
+                root_dir = util.root_pattern(".git"),
             })
 
             -- Rust
@@ -141,12 +172,24 @@ return {
                 root_dir = util.root_pattern("pyproject.toml", "setup.py", ".git"),
             })
 
-            -- CMake (if needed)
+            -- CMake
             lspconfig.cmake.setup({
                 root_dir = util.root_pattern("CMakeLists.txt", ".git"),
             })
 
-            -- Add more language servers here as needed
+            -- Lua (Neovim config + general Lua)
+            lspconfig.lua_ls.setup({
+                settings = {
+                    Lua = {
+                        runtime = {
+                            version = "LuaJIT",
+                        },
+                        telemetry = {
+                            enable = false,
+                        },
+                    },
+                },
+            })
         end,
     },
     {
@@ -184,10 +227,8 @@ return {
         },
     },
     {
-        "dnlhc/glance.nvim",
-        config = function()
-            require("glance").setup({})
-        end,
+        'dnlhc/glance.nvim',
+        cmd = 'Glance'
     },
     {
         "stevearc/oil.nvim",
@@ -284,5 +325,20 @@ return {
     {
         "j-hui/fidget.nvim",
         opts = {},
+    },
+    {
+        "akinsho/git-conflict.nvim",
+        version = "*",
+
+        ---@diagnostic disable-next-line
+        config = function()
+            require("git-conflict").setup({
+                default_mappings = false,
+                highlights = {
+                    incoming = "DiffAdd",
+                    current = "DiffText",
+                },
+            })
+        end,
     },
 }
