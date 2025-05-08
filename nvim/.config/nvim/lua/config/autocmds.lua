@@ -94,7 +94,7 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
             local elapsed_ns = vim.loop.hrtime() - build_start_time
             elapsed_s = string.format(" in %.2fs", elapsed_ns * 1e-9)
         end
-        if qf_size == 0 then
+        if (qf_size == 0 and vim.v.shell_error == 0) then
             vim.notify(
                 "✅ Task succeeded!" .. elapsed_s, vim.log.levels.INFO, {
                     title = "Make"
@@ -106,13 +106,20 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
                     break
                 end
             end
-        else
-        -- Notify errors.
-        vim.notify(
-            "❌ Task failed with " .. qf_size .. " issues" ..
-            elapsed_s, vim.log.levels.INFO, {
-                title = "Make"
-        })
+        elseif qf_size > 0 then
+            -- Notify errors.
+            vim.notify(
+                "❌ Task failed with " .. qf_size .. " issues" ..
+                elapsed_s, vim.log.levels.INFO, {
+                    title = "Make"
+            })
+        elseif vim.v.shell_error ~= 0 then
+            -- Nofity errors without count (maybe linker errors)
+            vim.notify(
+                "❌ Task failed" ..
+                elapsed_s, vim.log.levels.INFO, {
+                    title = "Make"
+            })
         end
     end,
 })

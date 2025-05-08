@@ -251,6 +251,24 @@ return {
                 },
                 git = {
                     enable = true,
+                    ignore = false,
+                },
+                renderer = {
+                    highlight_git = true,
+                    icons = {
+                        git_placement = "before", -- "before" puts icon before the filename
+                        glyphs = {
+                            git = {
+                                unstaged = "~",   -- ← changed (was "✗")
+                                staged = "+",     -- added to index
+                                unmerged = "",   -- merge conflict
+                                renamed = "➜",    -- renamed
+                                untracked = "?",  -- untracked
+                                deleted = "✘",    -- deleted
+                                ignored = "◌",    -- ignored
+                            },
+                        },
+                    },
                 },
                 view = {
                     width = 30,
@@ -260,6 +278,13 @@ return {
 
             -- Toggle with <leader>e
             vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Toggle nvim-tree" })
+
+            -- Disable color for other Git statuses
+            -- vim.api.nvim_set_hl(0, "NvimTreeGitDirty", {})
+            -- vim.api.nvim_set_hl(0, "NvimTreeGitStaged", {})
+            -- vim.api.nvim_set_hl(0, "NvimTreeGitNew", {})
+            -- vim.api.nvim_set_hl(0, "NvimTreeGitDeleted", {})
+            -- vim.api.nvim_set_hl(0, "NvimTreeGitRenamed", {})
         end,
     },
     -- {
