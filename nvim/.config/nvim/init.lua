@@ -75,10 +75,25 @@ vim.api.nvim_create_autocmd("FileType", {
         end
 
         vim.opt_local.makeprg = fallback
-
         vim.opt_local.errorformat = table.concat({
+            -- Compiler errors (with column)
             "%f:%l:%c: %t%*[^:]: %m",
+
+            -- Compiler errors (no column)
             "%f:%l: %t%*[^:]: %m",
+
+            -- Makefile target errors
+            "%f:%l: %m",
+            "make[%*\\d]: *** %m",
+            "gmake[%*\\d]: *** %m",
+            "make: *** %m",
+            "gmake: *** %m",
+
+            -- Linker errors
+            "collect2: %m",
+            "/usr/bin/ld: %m",
+
+            -- Filter out everything else
             "%-G%.%#",
         }, ",")
     end,
