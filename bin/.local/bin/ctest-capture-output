@@ -2,7 +2,8 @@
 set -e
 
 # Build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build -j "$(nproc)"
 
 # Run the tests and capture output
-ctest --output-on-failure --test-dir build | tee testresults.txt
+ctest --stop-on-failure --output-on-failure --test-dir build | tee testresults.txt

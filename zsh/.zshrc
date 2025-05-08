@@ -85,7 +85,8 @@ git_color() {
     elif [[ -n $dirty ]]; then
         echo -e '\033[1;31m'  # bold red
     else
-        echo -e '\033[1;37m'  # bold white
+        echo -e '\033[38;2;235;235;220m'    # Slightly softer RGB white
+        # echo -e '\033[38;2;255;255;255m'  # true RGB white
     fi
 }
 

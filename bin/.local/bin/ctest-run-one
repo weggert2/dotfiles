@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+
+test_target="$1"
+shift
+
+if [ -z "$test_target" ]; then
+    echo "Usage: ctest-run-one <test_target> [ctest args...]"
+    exit 1
+fi
+
+# Build the specified test target
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+cmake --build build --target "$test_target" -j"$(nproc)"
+
+# Run all tests matching the prefix and pipe output to both screen + file
+ctest --output-on-failure --test-dir build -R "${test_target}" "$@" | tee testresults.txt
+

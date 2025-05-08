@@ -82,7 +82,8 @@ vim.api.nvim_create_autocmd("QuickFixCmdPre", {
 vim.api.nvim_create_autocmd("QuickFixCmdPost", {
     pattern = "make",
     callback = function()
-        if vim.o.makeprg == "ctest-capture-output" then
+        if vim.o.makeprg == "ctest-capture-output" or
+           vim.o.makeprg:find("ctest-run-one", 1, true) then
             -- Don't show notifications for ctest
             return
         end
@@ -94,6 +95,10 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
             elapsed_s = string.format(" in %.2fs", elapsed_ns * 1e-9)
         end
         if qf_size == 0 then
+            vim.notify(
+                "✅ Task succeeded!" .. elapsed_s, vim.log.levels.INFO, {
+                    title = "Make"
+            })
             -- No errors, close the quickfix window if it's open
             for _, win in ipairs(vim.fn.getwininfo()) do
                 if win.quickfix == 1 then
@@ -101,10 +106,13 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
                     break
                 end
             end
-            vim.notify("✅ Task succeeded!" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
         else
-            -- Notify errors.
-            vim.notify("❌ Task failed with " .. qf_size .. " issues" .. elapsed_s, vim.log.levels.INFO, { title = "Make" })
+        -- Notify errors.
+        vim.notify(
+            "❌ Task failed with " .. qf_size .. " issues" ..
+            elapsed_s, vim.log.levels.INFO, {
+                title = "Make"
+        })
         end
     end,
 })

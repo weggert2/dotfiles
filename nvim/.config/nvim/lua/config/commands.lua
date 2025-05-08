@@ -71,64 +71,38 @@ vim.api.nvim_create_user_command("Man",
         complete = "shellcmd",
 })
 
-vim.api.nvim_create_user_command("Test", function()
-    local old_makeprg = vim.o.makeprg
-    local old_errorformat = vim.o.errorformat
+local cpp_errorformat = table.concat({
+    "%f:%l:%c: %t%*[^:]: %m",
+    "%f:%l: %m",
+}, ",")
 
-    -- Set makeprg to a script in ~/.local/bin that builds and captures tests
-    -- output. This is because I couldn't figure out how to pipe to an output
-    -- file usig vim lua
-    vim.o.makeprg = "ctest-capture-output"
-    vim.o.errorformat = table.concat({
-        "%f:%l:%c: %t%*[^:]: %m", -- filename:line:col: [type] message
-        "%f:%l: %m",              -- filename:line: message (fallback)
-    }, ",")
-
-    -- Run :make which uses makeprg to do the testing
-    vim.cmd("make")
-
-    local filepath = "testresults.txt"
+local function parse_gtest_output(filepath)
     local f = io.open(filepath, "r")
-    if not f then
-        vim.notify("No testresults.txt found", vim.log.levels.ERROR)
-        vim.o.makeprg = old_makeprg
-        vim.o.errorformat = old_errorformat
-        return
-    end
+    if not f then return nil, "Could not open " .. filepath end
 
-    local qf = {}
     local lines = {}
     for line in f:lines() do
         table.insert(lines, line)
     end
     f:close()
 
+    local qf = {}
     local i = 1
     while i <= #lines do
         local line = lines[i]
-
-        -- Look for a line called "RUN". All tests hae this, including
-        -- failed tests
         if line:match("^%[ RUN      %]") then
             local filename, linenum, msglines = nil, nil, {}
 
-            -- If the next line contains "Failure", then the test failed.
             for j = i + 1, math.min(i + 10, #lines) do
-                -- Parse into a format quickfix can understand
                 local f, l = lines[j]:match("^(.-):(%d+): Failure")
                 if f and l then
                     filename = f
                     linenum = tonumber(l)
                     i = j + 1
-
-                    -- Capture output until the FAILED, which will get the whole
-                    -- error message
                     while i <= #lines and not lines[i]:match("^%[  FAILED  %]") do
                         table.insert(msglines, lines[i])
                         i = i + 1
                     end
-
-                    -- Put what we just captured into the quickfix list
                     if filename and linenum and #msglines > 0 then
                         table.insert(qf, {
                             filename = filename,
@@ -146,24 +120,75 @@ vim.api.nvim_create_user_command("Test", function()
         end
     end
 
-    -- Set the whole quickfix list with our local qf, report result
-    vim.fn.setqflist(qf, "r")
+    return qf
+end
 
+local function set_quickfix_and_notify(qf, title, label)
+    vim.fn.setqflist(qf, "r")
     if #qf == 0 then
-        vim.notify("✅ All tests passed!", vim.log.levels.INFO, { title = "Test" })
+        vim.notify("✅ " .. label .. " passed", vim.log.levels.INFO, { title = title })
+        -- No errors, close the quickfix window if it's open
+        for _, win in ipairs(vim.fn.getwininfo()) do
+            if win.quickfix == 1 then
+                vim.cmd("cclose")
+                break
+            end
+        end
     else
-        vim.notify("❌ Test suite failed with " .. #qf .. " issue(s)", vim.log.levels.ERROR, { title = "Test" })
+        vim.notify("❌ " .. label .. " failed with " .. #qf .. " issue(s)", vim.log.levels.ERROR, { title = title })
+    end
+    os.remove("testresults.txt")
+end
+
+vim.api.nvim_create_user_command("Test", function()
+    local old_makeprg = vim.o.makeprg
+    local old_errorformat = vim.o.errorformat
+
+    vim.o.makeprg = "ctest-capture-output"
+    vim.o.errorformat = cpp_errorformat
+
+    vim.cmd("make")
+
+    local qf, err = parse_gtest_output("testresults.txt")
+    if not qf then
+        vim.notify(err, vim.log.levels.ERROR)
+        return
     end
 
-    -- Clean up
-    os.remove("testresults.txt")
+    set_quickfix_and_notify(qf, "Test", "All tests")
 
-    -- Restore settings
     vim.o.makeprg = old_makeprg
     vim.o.errorformat = old_errorformat
 end, {})
 
+vim.api.nvim_create_user_command("RunTest", function(opts)
+    local testname = opts.args
+    if testname == "" then
+        vim.notify("RunTest requires a test name", vim.log.levels.ERROR)
+        return
+    end
 
+    local old_makeprg = vim.o.makeprg
+    local old_errorformat = vim.o.errorformat
+
+    vim.o.makeprg = "ctest-run-one " .. vim.fn.shellescape(testname)
+    vim.o.errorformat = cpp_errorformat
+
+    vim.cmd("make")
+
+    local qf, err = parse_gtest_output("testresults.txt")
+    if not qf then
+        vim.notify(err, vim.log.levels.ERROR)
+        return
+    end
+
+    set_quickfix_and_notify(qf, "RunTest", testname)
+
+    vim.o.makeprg = old_makeprg
+    vim.o.errorformat = old_errorformat
+end, {
+    nargs = 1,
+})
 
 vim.api.nvim_create_user_command("Check", function()
     local old_makeprg = vim.o.makeprg
