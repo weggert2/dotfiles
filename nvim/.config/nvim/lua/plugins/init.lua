@@ -230,16 +230,16 @@ return {
         'dnlhc/glance.nvim',
         cmd = 'Glance'
     },
-    {
-        "stevearc/oil.nvim",
-        opts = {},
-        dependencies = { "nvim-tree/nvim-web-devicons" },
-        config = function()
-            require("oil").setup({
-                default_file_explorer = false,
-            })
-        end
-    },
+    -- {
+    --     "stevearc/oil.nvim",
+    --     opts = {},
+    --     dependencies = { "nvim-tree/nvim-web-devicons" },
+    --     config = function()
+    --         require("oil").setup({
+    --             default_file_explorer = false,
+    --         })
+    --     end
+    -- },
     {
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },

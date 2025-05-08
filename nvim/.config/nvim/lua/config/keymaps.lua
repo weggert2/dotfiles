@@ -53,6 +53,9 @@ vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { desc = "Move selection up", sile
 vim.keymap.set("n", "<C-j>", "<C-d>zz", { desc = "Scroll down + center", noremap = true, silent = true })
 vim.keymap.set("n", "<C-k>", "<C-u>zz", { desc = "Scroll up + center", noremap = true, silent = true })
 
+-- Diagnostics (the squiggly lines)
+vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Show diagnostics at cursor", noremap = true, silent = true })
+
 local copilot_enabled = true
 vim.keymap.set("n", "<leader>ct", function()
     copilot_enabled = not copilot_enabled

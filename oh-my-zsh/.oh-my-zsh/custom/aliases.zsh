@@ -14,7 +14,7 @@ alias v="nvim"
 alias v.="nvim ."
 alias rm="rm --verbose"
 alias edz="nvim ~/.zshrc"
-alias gdb="gdb -tui --args"
+# alias gdb="gdb -tui --args"
 
 teeclip() {
   if [ "$XDG_SESSION_TYPE" = "wayland" ] && command -v wl-copy >/dev/null 2>&1; then
