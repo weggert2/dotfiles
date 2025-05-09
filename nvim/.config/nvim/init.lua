@@ -28,6 +28,8 @@ vim.opt.listchars = {
     precedes = "⟨",  -- when line overflows left
 }
 
+vim.opt.guicursor = "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50"
+
 require("config.keymaps")
 require("config.lazy")
 require("config.commands")

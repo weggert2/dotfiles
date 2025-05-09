@@ -132,3 +132,7 @@ vim.api.nvim_create_autocmd({ "FocusLost", "BufLeave" }, {
         end
     end,
 })
+
+vim.api.nvim_create_autocmd("FocusGained", {
+    command = "set guicursor&"
+})
