@@ -121,10 +121,10 @@ vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration",
 vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation", noremap = true, silent = true })
 vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references", noremap = true, silent = true })
 
-vim.keymap.set("n", "Gd", "<cmd>Glance definitions<CR>", { desc = "Glance Definitions", noremap = true, silent = true })
-vim.keymap.set("n", "Gr", "<cmd>Glance references<CR>", { desc = "Glance References", noremap = true, silent = true })
-vim.keymap.set("n", "Gi", "<cmd>Glance implementations<CR>", { desc = "Glance Implementations", noremap = true, silent = true })
-vim.keymap.set("n", "Gt", "<cmd>Glance type_definitions<CR>", { desc = "Glance Type Definitions", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>Gd", "<cmd>Glance definitions<CR>", { desc = "Glance Definitions", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>Gr", "<cmd>Glance references<CR>", { desc = "Glance References", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>Gi", "<cmd>Glance implementations<CR>", { desc = "Glance Implementations", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>Gt", "<cmd>Glance type_definitions<CR>", { desc = "Glance Type Definitions", noremap = true, silent = true })
 
 vim.keymap.set("n", "gs", function()
     local params = { uri = vim.uri_from_bufnr(0) }

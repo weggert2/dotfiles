@@ -42,78 +42,78 @@ return {
             })
         end,
     },
-    {
-        "hrsh7th/nvim-cmp",            -- Main completion engine
-        dependencies = {
-            "hrsh7th/cmp-nvim-lsp",      -- LSP completions
-            "hrsh7th/cmp-buffer",        -- Buffer words
-            "hrsh7th/cmp-path",          -- Filesystem paths
-            "hrsh7th/cmp-cmdline",       -- Command-line completions
-            "L3MON4D3/LuaSnip",          -- Snippet engine
-            "saadparwaiz1/cmp_luasnip",  -- Snippet completions
-        },
-        config = function()
-            local cmp = require("cmp")
-            local luasnip = require("luasnip")
-
-            cmp.setup({
-                completion = {
-                    autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
-                    keyword_length = 4, -- don't trigger until 4 characters typed
-                },
-                snippet = {
-                    expand = function(args)
-                        luasnip.lsp_expand(args.body)
-                    end,
-                },
-                mapping = cmp.mapping.preset.insert({
-                    ["<C-Space>"] = cmp.mapping.complete(),
-                    ["<CR>"] = cmp.mapping.confirm({ select = true }),
-                    ["<Tab>"] = cmp.mapping(function(fallback)
-                        if cmp.visible() then
-                            cmp.select_next_item()
-                        elseif luasnip.expand_or_jumpable() then
-                            luasnip.expand_or_jump()
-                        else
-                            fallback()
-                        end
-                    end, { "i", "s" }),
-                    ["<S-Tab>"] = cmp.mapping(function(fallback)
-                        if cmp.visible() then
-                            cmp.select_prev_item()
-                        elseif luasnip.jumpable(-1) then
-                            luasnip.jump(-1)
-                        else
-                            fallback()
-                        end
-                    end, { "i", "s" }),
-                }),
-                cmp.setup.filetype("cmake", {
-                    completion = {
-                        keyword_length = 2,
-                    },
-                }),
-                sources = cmp.config.sources({
-                    { name = "nvim_lsp", priority = 5 },
-                    { name = "luasnip",  priority = 3 },
-                    { name = "buffer",   priority = 7 },
-                    { name = "path",     priority = 4 },
-                }),
-                sorting = {
-                    priority_weight = 2,
-                    comparators = {
-                        cmp.config.compare.offset,
-                        cmp.config.compare.exact,
-                        cmp.config.compare.score,
-                        cmp.config.compare.kind,
-                        cmp.config.compare.sort_text,
-                        cmp.config.compare.length,
-                        cmp.config.compare.order,
-                    },
-                },
-            })
-        end,
-    },
+    -- {
+    --     "hrsh7th/nvim-cmp",            -- Main completion engine
+    --     dependencies = {
+    --         "hrsh7th/cmp-nvim-lsp",      -- LSP completions
+    --         "hrsh7th/cmp-buffer",        -- Buffer words
+    --         "hrsh7th/cmp-path",          -- Filesystem paths
+    --         "hrsh7th/cmp-cmdline",       -- Command-line completions
+    --         "L3MON4D3/LuaSnip",          -- Snippet engine
+    --         "saadparwaiz1/cmp_luasnip",  -- Snippet completions
+    --     },
+    --     config = function()
+    --         local cmp = require("cmp")
+    --         local luasnip = require("luasnip")
+    --
+    --         cmp.setup({
+    --             completion = {
+    --                 autocomplete = { require("cmp.types").cmp.TriggerEvent.TextChanged },
+    --                 keyword_length = 4, -- don't trigger until 4 characters typed
+    --             },
+    --             snippet = {
+    --                 expand = function(args)
+    --                     luasnip.lsp_expand(args.body)
+    --                 end,
+    --             },
+    --             mapping = cmp.mapping.preset.insert({
+    --                 ["<C-Space>"] = cmp.mapping.complete(),
+    --                 ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    --                 ["<Tab>"] = cmp.mapping(function(fallback)
+    --                     if cmp.visible() then
+    --                         cmp.select_next_item()
+    --                     elseif luasnip.expand_or_jumpable() then
+    --                         luasnip.expand_or_jump()
+    --                     else
+    --                         fallback()
+    --                     end
+    --                 end, { "i", "s" }),
+    --                 ["<S-Tab>"] = cmp.mapping(function(fallback)
+    --                     if cmp.visible() then
+    --                         cmp.select_prev_item()
+    --                     elseif luasnip.jumpable(-1) then
+    --                         luasnip.jump(-1)
+    --                     else
+    --                         fallback()
+    --                     end
+    --                 end, { "i", "s" }),
+    --             }),
+    --             cmp.setup.filetype("cmake", {
+    --                 completion = {
+    --                     keyword_length = 2,
+    --                 },
+    --             }),
+    --             sources = cmp.config.sources({
+    --                 { name = "nvim_lsp", priority = 5 },
+    --                 { name = "luasnip",  priority = 3 },
+    --                 { name = "buffer",   priority = 7 },
+    --                 { name = "path",     priority = 4 },
+    --             }),
+    --             sorting = {
+    --                 priority_weight = 2,
+    --                 comparators = {
+    --                     cmp.config.compare.offset,
+    --                     cmp.config.compare.exact,
+    --                     cmp.config.compare.score,
+    --                     cmp.config.compare.kind,
+    --                     cmp.config.compare.sort_text,
+    --                     cmp.config.compare.length,
+    --                     cmp.config.compare.order,
+    --                 },
+    --             },
+    --         })
+    --     end,
+    -- },
     {
         "williamboman/mason.nvim",
         config = true,
