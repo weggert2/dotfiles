@@ -1,41 +1,42 @@
 -- Telescope keymaps
-vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find files" })
-vim.keymap.set("n", "<leader>gr", "<cmd>Telescope live_grep<CR>", { desc = "Grep in files" })
-vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "List open buffers" })
-vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>", { desc = "Help tags" })
+vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find files"        })
+vim.keymap.set("n", "<leader>gr", "<cmd>Telescope live_grep<CR>",  { desc = "Grep in files"     })
+vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>",    { desc = "List open buffers" })
+vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>",  { desc = "Help tags"         })
 
 -- Example: exit terminal mode
 vim.keymap.set("t", "<C-q>", [[<C-\><C-n>]], { desc = "Exit terminal mode", noremap = true })
 
 -- Fast access to config files
-vim.keymap.set("n", "<leader>ei", "<cmd>edit ~/.config/nvim/init.lua<CR>", { desc = "Edit init.lua" })
-vim.keymap.set("n", "<leader>ep", "<cmd>edit ~/.config/nvim/lua/plugins/init.lua<CR>", { desc = "Edit plugins/init.lua" })
-vim.keymap.set("n", "<leader>ek", "<cmd>edit ~/.config/nvim/lua/config/keymaps.lua<CR>", { desc = "Edit keymaps.lua" })
-vim.keymap.set("n", "<leader>et", "<cmd>edit ~/.config/nvim/lua/config/treesitter.lua<CR>", { desc = "Edit treesitter.lua" })
-vim.keymap.set("n", "<leader>el", "<cmd>edit ~/.config/nvim/lua/config/lazy.lua<CR>", { desc = "Edit lazy.lua" })
-vim.keymap.set("n", "<leader>ec", "<cmd>edit ~/.config/nvim/lua/config/commands.lua<CR>", { desc = "Edit commands.lua" })
-vim.keymap.set("n", "<leader>ea", "<cmd>edit ~/.config/nvim/lua/config/autocmds.lua<CR>", { desc = "Edit autocmds.lua" })
-vim.keymap.set("n", "<leader>er", "<cmd>edit ~/.config/nvim/lua/config/colors.lua<CR>", { desc = "Edit colors.lua" })
+local config = vim.fn.stdpath("config")
+vim.keymap.set("n", "<leader>ei", "<cmd>edit " .. config .. "/init.lua<CR>",                  { desc = "Edit init.lua"         })
+vim.keymap.set("n", "<leader>ep", "<cmd>edit " .. config .. "/lua/plugins/init.lua<CR>",      { desc = "Edit plugins/init.lua" })
+vim.keymap.set("n", "<leader>ek", "<cmd>edit " .. config .. "/lua/config/keymaps.lua<CR>",    { desc = "Edit keymaps.lua"      })
+vim.keymap.set("n", "<leader>et", "<cmd>edit " .. config .. "/lua/config/treesitter.lua<CR>", { desc = "Edit treesitter.lua"   })
+vim.keymap.set("n", "<leader>el", "<cmd>edit " .. config .. "/lua/config/lazy.lua<CR>",       { desc = "Edit lazy.lua"         })
+vim.keymap.set("n", "<leader>ec", "<cmd>edit " .. config .. "/lua/config/commands.lua<CR>",   { desc = "Edit commands.lua"     })
+vim.keymap.set("n", "<leader>ea", "<cmd>edit " .. config .. "/lua/config/autocmds.lua<CR>",   { desc = "Edit autocmds.lua"     })
+vim.keymap.set("n", "<leader>er", "<cmd>edit " .. config .. "/lua/config/colors.lua<CR>",     { desc = "Edit colors.lua"       })
 
 -- Delete without yank (black hole register)
-vim.keymap.set("n", "d", '"_d', { noremap = true })
+vim.keymap.set("n", "d", '"_d',   { noremap = true })
 vim.keymap.set("n", "dd", '"_dd', { noremap = true })
-vim.keymap.set("n", "D", '"_D', { noremap = true })
-vim.keymap.set("v", "d", '"_d', { noremap = true })
-vim.keymap.set("v", "D", '"_D', { noremap = true })
+vim.keymap.set("n", "D", '"_D',   { noremap = true })
+vim.keymap.set("v", "d", '"_d',   { noremap = true })
+vim.keymap.set("v", "D", '"_D',   { noremap = true })
 
 -- Yank+delete using <leader>
-vim.keymap.set("n", "<leader>d", "d", { noremap = true, desc = "Delete with yank" })
+vim.keymap.set("n", "<leader>d", "d",   { noremap = true, desc = "Delete with yank" })
 vim.keymap.set("n", "<leader>dd", "dd", { noremap = true, desc = "Delete line with yank" })
-vim.keymap.set("n", "<leader>D", "D", { noremap = true, desc = "Delete to EOL with yank" })
-vim.keymap.set("v", "<leader>d", "d", { noremap = true, desc = "Delete with yank (visual)" })
-vim.keymap.set("v", "<leader>D", "D", { noremap = true, desc = "Delete to EOL with yank (visual)" })
+vim.keymap.set("n", "<leader>D", "D",   { noremap = true, desc = "Delete to EOL with yank" })
+vim.keymap.set("v", "<leader>d", "d",   { noremap = true, desc = "Delete with yank (visual)" })
+vim.keymap.set("v", "<leader>D", "D",   { noremap = true, desc = "Delete to EOL with yank (visual)" })
 
 -- git-conflict
-vim.keymap.set("n", "<leader>ac", "<cmd>GitConflictChooseOurs<CR>", { desc = "Accept Current", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>ac", "<cmd>GitConflictChooseOurs<CR>",   { desc = "Accept Current", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>ai", "<cmd>GitConflictChooseTheirs<CR>", { desc = "Accept Incoming", noremap = true, silent = true })
-vim.keymap.set("n", "<leader>ab", "<cmd>GitConflictChooseBoth<CR>", { desc = "Accept Both", noremap = true, silent = true })
-vim.keymap.set("n", "<leader>aq", "<cmd>GitConflictListQf<CR>", { desc = "List Conflicts (Quickfix)", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>ab", "<cmd>GitConflictChooseBoth<CR>",   { desc = "Accept Both", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>aq", "<cmd>GitConflictListQf<CR>",       { desc = "List Conflicts (Quickfix)", noremap = true, silent = true })
 
 -- Paste below/above the current line
 vim.keymap.set("n", "<leader>p", function() vim.cmd("put")  end, { desc = "Paste below line" })
@@ -52,9 +53,6 @@ vim.keymap.set("v", "<A-k>", ":m '<-2<CR>gv", { desc = "Move selection up", sile
 -- Page up/down with ctrl+j/k (and center)
 vim.keymap.set("n", "<C-j>", "<C-d>zz", { desc = "Scroll down + center", noremap = true, silent = true })
 vim.keymap.set("n", "<C-k>", "<C-u>zz", { desc = "Scroll up + center", noremap = true, silent = true })
-
--- Diagnostics (the squiggly lines)
-vim.keymap.set("n", "<leader>k", vim.diagnostic.open_float, { desc = "Show diagnostics at cursor", noremap = true, silent = true })
 
 local copilot_enabled = true
 vim.keymap.set("n", "<leader>ct", function()

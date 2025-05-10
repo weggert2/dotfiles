@@ -230,3 +230,18 @@ vim.api.nvim_create_user_command("Check", function()
     vim.o.makeprg = old_makeprg
 end, {})
 
+-- Test the file currently open
+vim.api.nvim_create_user_command("TestMe", function()
+    local basename = vim.fn.expand("%:t:r")
+
+    local testname
+    if basename:match("^Test") then
+        testname = basename
+    else
+        testname = "Test" .. basename
+    end
+
+    vim.cmd("RunTest " .. testname)
+end, {
+    desc = "Run test corresponding to current file",
+})
