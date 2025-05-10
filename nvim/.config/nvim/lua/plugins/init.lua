@@ -136,8 +136,66 @@ return {
         end,
     },
     {
-        "folke/neodev.nvim",
-        opts = {}, -- use defaults
+        "mfussenegger/nvim-dap",
+        config = function()
+            local dap = require("dap")
+
+            dap.adapters.codelldb = {
+                type = "server",
+                port = "${port}",
+                executable = {
+                    command = vim.fn.stdpath("data") .. "/mason/bin/codelldb",
+                    args = { "--port", "${port}" },
+                },
+            }
+
+            dap.configurations.cpp = {
+                {
+                    name = "Launch file",
+                    type = "codelldb",
+                    request = "launch",
+                    program = function()
+                        return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+                    end,
+                    cwd = "${workspaceFolder}",
+                    stopOnEntry = true,
+                },
+            }
+
+            dap.configurations.c = dap.configurations.cpp
+            dap.configurations.rust = dap.configurations.cpp
+        end
+    },
+    {
+        "nvim-neotest/nvim-nio",
+    },
+    {
+        "rcarriga/nvim-dap-ui",
+        dependencies = {
+            "mfussenegger/nvim-dap",
+            "nvim-neotest/nvim-nio",
+        },
+        config = function()
+            require("dapui").setup()
+        end,
+    },
+    {
+        "mfussenegger/nvim-dap-python",
+        dependencies = { "mfussenegger/nvim-dap" },
+        config = function()
+            require("dap-python").setup("~/.local/share/nvim/mason/packages/debugpy/venv/bin/python")
+        end,
+        ft = { "python" },
+    },
+    {
+        "jay-babu/mason-nvim-dap.nvim",
+        dependencies = { "mfussenegger/nvim-dap", "williamboman/mason.nvim" },
+        config = function()
+            require("mason-nvim-dap").setup({
+                ensure_installed = { "codelldb" },
+                automatic_installation = true,
+            })
+        end,
     },
     {
         "neovim/nvim-lspconfig",
@@ -220,6 +278,7 @@ return {
         opts = {},
         keys = {
             { "s", mode = { "n", "x", "o" }, function() require("flash").jump({jump = {pos = "range"}}) end, desc = "Flash" },
+            { "<leader>s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
             { "fS", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
             { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
             { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
