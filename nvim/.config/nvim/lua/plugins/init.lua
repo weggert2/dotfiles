@@ -307,12 +307,35 @@ return {
         init = function()
             vim.g.VM_default_mappings = true
             vim.g.VM_maps = {
-                ["Find Under"] = "<C-d>",
-                ["Find Subword Under"] = "<C-d>",
+                ["Find Under"] = "<C-n>",
+                ["Find Subword Under"] = "<C-n>",
                 ["Remove Region"] = "<C-u>",
                 ["Skip Region"] = "<C-j>", -- skip current and move to next
                 ["Align"] = "<M-a>",
             }
+        end,
+        config = function()
+            local red = "#ff5555"
+            local white = "#ffffff"
+            local bold = true
+
+            local groups = {
+                "VM_Extend",
+                "VM_Cursor",
+                "VM_Insert",
+                "VM_Mono",
+                "VM_Selection",
+            }
+
+            for _, group in ipairs(groups) do
+                vim.api.nvim_set_hl(0, group, {
+                    ctermbg = 203,
+                    ctermfg = 15,
+                    bg = red,
+                    fg = white,
+                    bold = bold,
+                })
+            end
         end,
     },
     {
