@@ -125,7 +125,9 @@ vim.keymap.set("n", "<leader>Gd", "<cmd>Glance definitions<CR>", { desc = "Glanc
 vim.keymap.set("n", "<leader>Gr", "<cmd>Glance references<CR>", { desc = "Glance References", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>Gi", "<cmd>Glance implementations<CR>", { desc = "Glance Implementations", noremap = true, silent = true })
 vim.keymap.set("n", "<leader>Gt", "<cmd>Glance type_definitions<CR>", { desc = "Glance Type Definitions", noremap = true, silent = true })
+vim.keymap.set("n", "gm", "50%zz", { desc = "Jump to middle of file"})
 
+-- Jump to the source
 vim.keymap.set("n", "gs", function()
     local params = { uri = vim.uri_from_bufnr(0) }
 
@@ -145,9 +147,8 @@ vim.keymap.set("n", "gs", function()
     vim.notify("Clangd is not active or doesn't support header/source switching", vim.log.levels.WARN)
 end, { desc = "Switch between header/source" })
 
-vim.keymap.set("n", "gm", "50%zz", { desc = "Jump to middle of file"})
-
-vim.keymap.set("n", "gds", function()
+-- Jump to the definition in a split
+vim.keymap.set("n", "<leader>gd", function()
     local params = vim.lsp.util.make_position_params()
 
     local function open_location(result)
@@ -191,4 +192,70 @@ vim.keymap.set("n", "gds", function()
 
     vim.notify("LSP client does not support textDocument/definition", vim.log.levels.WARN)
 end, { desc = "Go to definition (smart split)" })
+
+-- Go to test file
+vim.keymap.set("n", "gt", function()
+    local current = vim.api.nvim_buf_get_name(0)
+    local dir = vim.fn.fnamemodify(current, ":h")
+    local file = vim.fn.fnamemodify(current, ":t")
+    local is_test = dir:match("/test$")
+
+    -- Strip common C/C++ extensions
+    local function strip_extension(fname)
+        return fname
+            :gsub("%.cpp$", "")
+            :gsub("%.cxx$", "")
+            :gsub("%.cc$", "")
+            :gsub("%.c$", "")
+            :gsub("%.hpp$", "")
+            :gsub("%.hxx$", "")
+            :gsub("%.hh$", "")
+            :gsub("%.h$", "")
+    end
+
+    local function jump_to(candidates)
+        for _, path in ipairs(candidates) do
+            if vim.fn.filereadable(path) == 1 then
+                vim.cmd("edit " .. path)
+                return
+            end
+        end
+
+        vim.notify("File not found: " .. file, vim.log.levels.WARN)
+    end
+
+    -- Jump from test → source
+    if is_test and file:match("^Test") then
+        local base = file:match("^Test(.+)$")
+        base = strip_extension(base or "")
+        local parent_dir = vim.fn.fnamemodify(dir, ":h")
+
+        local candidates = {
+            parent_dir .. "/" .. base .. ".cpp",
+            parent_dir .. "/" .. base .. ".cxx",
+            parent_dir .. "/" .. base .. ".cc",
+            parent_dir .. "/" .. base .. ".c",
+            parent_dir .. "/" .. base .. ".hpp",
+            parent_dir .. "/" .. base .. ".hxx",
+            parent_dir .. "/" .. base .. ".hh",
+            parent_dir .. "/" .. base .. ".h",
+        }
+
+        jump_to(candidates)
+        return
+    end
+
+    -- Jump from source → test
+    local basename = strip_extension(file)
+    local test_dir = dir .. "/test"
+
+    local candidates = {
+        test_dir .. "/Test" .. basename .. ".cpp",
+        test_dir .. "/Test" .. basename .. ".cxx",
+        test_dir .. "/Test" .. basename .. ".cc",
+        test_dir .. "/Test" .. basename .. ".c",
+    }
+
+    jump_to(candidates)
+end, { desc = "Toggle between source and test file" })
 
