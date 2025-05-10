@@ -1,0 +1,21 @@
+﻿# https://zed0.co.uk/clang-format-configurator/
+---
+BasedOnStyle: Chromium
+AccessModifierOffset: '-4'
+AlignAfterOpenBracket: AlwaysBreak
+AllowAllArgumentsOnNextLine: 'true'
+BreakBeforeBraces: Allman
+IncludeBlocks: Preserve
+IndentWidth: '4'
+PointerAlignment: Right
+SortIncludes: 'true'
+SortUsingDeclarations: 'true'
+SpaceAfterTemplateKeyword: 'true'
+SpaceBeforeCpp11BracedList: 'true'
+SpaceBeforeCtorInitializerColon: 'true'
+SpaceBeforeInheritanceColon: 'true'
+SpaceBeforeRangeBasedForLoopColon: 'true'
+TabWidth: '4'
+UseTab: Never
+
+...
