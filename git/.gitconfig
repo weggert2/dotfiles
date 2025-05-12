@@ -21,7 +21,7 @@
     followTags = true
 
 [core]
-    editor = vim
+    editor = nvim
 
 [init]
     defaultBranch = main

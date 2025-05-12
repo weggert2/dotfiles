@@ -151,7 +151,7 @@ bindkey '^[e' autosuggest-accept
 
 # virtualenvwrapper setup
 export WORKON_HOME=$HOME/.virtualenvs
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+export VIRTUALENVWRAPPER_PYTHON=$(which python3)
 export VIRTUALENVWRAPPER_VIRTUALENV=$(command -v virtualenv)
 source $(command -v virtualenvwrapper.sh)
 
@@ -159,3 +159,6 @@ source $(command -v virtualenvwrapper.sh)
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# Created by `pipx` on 2025-05-12 22:23:06
+export PATH="$PATH:/home/bill/.local/bin"
