@@ -27,8 +27,14 @@ teeclip() {
 }
 
 vrun() {
-  echo "$@"
+  echo "=== $@ ==="
   "$@"
 }
-alias upgrade="vrun sudo aptitude update && vrun sudo aptitude upgrade && vrun sudo snap refresh && vrun cargo install-update -a"
+
+upgrade() {
+  vrun sudo aptitude update &&
+  vrun sudo aptitude upgrade &&
+  vrun sudo snap refresh &&
+  vrun cargo install-update -a
+}
 
