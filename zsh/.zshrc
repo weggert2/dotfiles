@@ -153,7 +153,7 @@ bindkey '^[e' autosuggest-accept
 export WORKON_HOME=$HOME/.virtualenvs
 export VIRTUALENVWRAPPER_PYTHON=$(which python3)
 export VIRTUALENVWRAPPER_VIRTUALENV=$(command -v virtualenv)
-source $(command -v virtualenvwrapper.sh)
+#source $(command -v virtualenvwrapper.sh)
 
 # NVM setup
 export NVM_DIR="$HOME/.nvm"
