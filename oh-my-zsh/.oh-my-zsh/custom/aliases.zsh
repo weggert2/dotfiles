@@ -1,4 +1,3 @@
-alias upgrade="sudo aptitude update && sudo aptitude upgrade && sudo snap refresh && cargo install-update -a"
 alias alpha_queue="sudo sysctl -w fs.mqueue.msg_max=256"
 alias fprime_mmap="sudo sysctl vm.mmap_rnd_bits=28"
 alias ac="cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
@@ -26,4 +25,10 @@ teeclip() {
     tee
   fi
 }
+
+vrun() {
+  echo "$@"
+  "$@"
+}
+alias upgrade="vrun sudo aptitude update && vrun sudo aptitude upgrade && vrun sudo snap refresh && vrun cargo install-update -a"
 
