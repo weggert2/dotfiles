@@ -443,7 +443,7 @@ return {
                     lualine_x = { 'filetype' },
                     lualine_y = {
                         function()
-                            return os.date("%H:%M %Z")
+                            return os.date("%H:%M %Z | %d-%b-%y")
                         end,
                     },
                     lualine_z = { 'location' },
