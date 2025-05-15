@@ -18,6 +18,9 @@ vim.keymap.set("n", "<leader>ec", "<cmd>edit " .. config .. "/lua/config/command
 vim.keymap.set("n", "<leader>ea", "<cmd>edit " .. config .. "/lua/config/autocmds.lua<CR>",   { desc = "Edit autocmds.lua"     })
 vim.keymap.set("n", "<leader>er", "<cmd>edit " .. config .. "/lua/config/colors.lua<CR>",     { desc = "Edit colors.lua"       })
 
+-- Paste without yanking. Why does everything yank?
+vim.keymap.set("x", "p", '"_dP', { noremap = true, silent = true })
+
 -- Delete without yank (black hole register)
 vim.keymap.set("n", "d", '"_d',   { noremap = true })
 vim.keymap.set("n", "dd", '"_dd', { noremap = true })

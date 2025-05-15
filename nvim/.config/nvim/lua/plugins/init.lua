@@ -289,16 +289,6 @@ return {
         'dnlhc/glance.nvim',
         cmd = 'Glance'
     },
-    -- {
-    --     "stevearc/oil.nvim",
-    --     opts = {},
-    --     dependencies = { "nvim-tree/nvim-web-devicons" },
-    --     config = function()
-    --         require("oil").setup({
-    --             default_file_explorer = false,
-    --         })
-    --     end
-    -- },
     {
         "nvim-tree/nvim-tree.lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -335,8 +325,8 @@ return {
                 },
             })
 
-            -- Toggle with <leader>e
-            vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>", { desc = "Toggle nvim-tree" })
+            -- Toggle with <leader>nt
+            vim.keymap.set("n", "<leader>nt", ":NvimTreeToggle<CR>", { desc = "Toggle nvim-tree" })
 
             -- Disable color for other Git statuses
             -- vim.api.nvim_set_hl(0, "NvimTreeGitDirty", {})
@@ -346,20 +336,6 @@ return {
             -- vim.api.nvim_set_hl(0, "NvimTreeGitRenamed", {})
         end,
     },
-    -- {
-    --     "rcarriga/nvim-notify",
-    --     lazy = false, -- load immediately so vim.notify is overridden early
-    --     config = function()
-    --         require("notify").setup({
-    --             stages = "fade_in_slide_out",
-    --             timeout = 3000,
-    --             background_colour = "#000000",
-    --         })
-    --
-    --         -- Override default vim.notify
-    --         vim.notify = require("notify")
-    --     end,
-    -- }
     {
         "mg979/vim-visual-multi",
         branch = "master",
@@ -465,7 +441,11 @@ return {
                     lualine_b = {},
                     lualine_c = { 'filename' },
                     lualine_x = { 'filetype' },
-                    lualine_y = {},
+                    lualine_y = {
+                        function()
+                            return os.date("%H:%M %Z")
+                        end,
+                    },
                     lualine_z = { 'location' },
                 },
             })
