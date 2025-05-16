@@ -161,35 +161,6 @@ vim.api.nvim_create_user_command("Test", function()
     vim.o.errorformat = old_errorformat
 end, {})
 
-vim.api.nvim_create_user_command("RunTest", function(opts)
-    local testname = opts.args
-    if testname == "" then
-        vim.notify("RunTest requires a test name", vim.log.levels.ERROR)
-        return
-    end
-
-    local old_makeprg = vim.o.makeprg
-    local old_errorformat = vim.o.errorformat
-
-    vim.o.makeprg = "ctest-run-one " .. vim.fn.shellescape(testname)
-    vim.o.errorformat = cpp_errorformat
-
-    vim.cmd("make")
-
-    local qf, err = parse_gtest_output("testresults.txt")
-    if not qf then
-        vim.notify(err, vim.log.levels.ERROR)
-        return
-    end
-
-    set_quickfix_and_notify(qf, "RunTest", testname)
-
-    vim.o.makeprg = old_makeprg
-    vim.o.errorformat = old_errorformat
-end, {
-    nargs = 1,
-})
-
 vim.api.nvim_create_user_command("Check", function()
     local old_makeprg = vim.o.makeprg
     vim.o.makeprg = "./scripts/run_cppcheck.sh"
@@ -230,18 +201,86 @@ vim.api.nvim_create_user_command("Check", function()
     vim.o.makeprg = old_makeprg
 end, {})
 
--- Test the file currently open
-vim.api.nvim_create_user_command("TestMe", function()
-    local basename = vim.fn.expand("%:t:r")
+-- vim.api.nvim_create_user_command("RunTest", function(opts)
+--     local testname = opts.args
+--     if testname == "" then
+--         vim.notify("RunTest requires a test name", vim.log.levels.ERROR)
+--         return
+--     end
+--
+--     local old_makeprg = vim.o.makeprg
+--     local old_errorformat = vim.o.errorformat
+--
+--     vim.o.makeprg = "ctest-run-one " .. vim.fn.shellescape(testname)
+--     vim.o.errorformat = cpp_errorformat
+--
+--     vim.cmd("make")
+--
+--     local qf, err = parse_gtest_output("testresults.txt")
+--     if not qf then
+--         vim.notify(err, vim.log.levels.ERROR)
+--         return
+--     end
+--
+--     set_quickfix_and_notify(qf, "RunTest", testname)
+--
+--     vim.o.makeprg = old_makeprg
+--     vim.o.errorformat = old_errorformat
+-- end, {
+--     nargs = 1,
+-- })
+--
+-- -- Test the file currently open
+-- vim.api.nvim_create_user_command("TestMe", function()
+--     local basename = vim.fn.expand("%:t:r")
+--
+--     local testname
+--     if basename:match("^Test") then
+--         testname = basename
+--     else
+--         testname = "Test" .. basename
+--     end
+--
+--     vim.cmd("RunTest " .. testname)
+-- end, {
+--     desc = "Run test corresponding to current file",
+-- })
+--
 
-    local testname
-    if basename:match("^Test") then
-        testname = basename
-    else
-        testname = "Test" .. basename
+-- Run a test by name
+local function run_test_by_name(testname)
+    if testname == "" then
+        vim.notify("Requires a test name", vim.log.levels.ERROR)
+        return
     end
 
-    vim.cmd("RunTest " .. testname)
+    local old_makeprg = vim.o.makeprg
+    local old_errorformat = vim.o.errorformat
+
+    vim.o.makeprg = "ctest-run-one " .. vim.fn.shellescape(testname)
+    vim.o.errorformat = cpp_errorformat
+
+    vim.cmd("make")
+
+    local qf, err = parse_gtest_output("testresults.txt")
+    if not qf then
+        vim.notify(err, vim.log.levels.ERROR)
+    else
+        set_quickfix_and_notify(qf, "RunTest", testname)
+    end
+
+    vim.o.makeprg = old_makeprg
+    vim.o.errorformat = old_errorformat
+end
+
+vim.api.nvim_create_user_command("RunTest", function(opts)
+    run_test_by_name(opts.args)
+end, { nargs = 1 })
+
+vim.api.nvim_create_user_command("TestMe", function()
+    local basename = vim.fn.expand("%:t:r")
+    local testname = basename:match("^Test") and basename or "Test" .. basename
+    run_test_by_name(testname)
 end, {
     desc = "Run test corresponding to current file",
 })
