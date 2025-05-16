@@ -11,7 +11,7 @@ vim.opt.shiftwidth = 4          -- Indent width
 vim.opt.softtabstop = 4         -- Backspace/delete treats 4 spaces as a tab
 vim.opt.smartindent = true      -- Auto-indent new lines
 vim.opt.splitright = true
-vim.opt.scrolloff = 5
+vim.opt.scrolloff = 10
 vim.opt.number = true           -- Absolute line number for the current line
 vim.opt.relativenumber = true   -- Relative line numbers for all others
 
