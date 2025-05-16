@@ -3,6 +3,7 @@ vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Fin
 vim.keymap.set("n", "<leader>gr", "<cmd>Telescope live_grep<CR>",  { desc = "Grep in files"     })
 vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<CR>",    { desc = "List open buffers" })
 vim.keymap.set("n", "<leader>fh", "<cmd>Telescope help_tags<CR>",  { desc = "Help tags"         })
+vim.keymap.set("n", "<leader>/", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { desc = "Fuzzy search in current buffer" })
 
 -- Example: exit terminal mode
 vim.keymap.set("t", "<C-q>", [[<C-\><C-n>]], { desc = "Exit terminal mode", noremap = true })
