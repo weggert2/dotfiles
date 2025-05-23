@@ -29,6 +29,22 @@ vim.keymap.set("n", "D", '"_D',   { noremap = true })
 vim.keymap.set("v", "d", '"_d',   { noremap = true })
 vim.keymap.set("v", "D", '"_D',   { noremap = true })
 
+-- Change without yanking
+vim.keymap.set("n", "c", '"_c', { noremap = true })
+vim.keymap.set("n", "C", '"_C', { noremap = true })
+vim.keymap.set("n", "d", '"_d', { noremap = true })
+vim.keymap.set("n", "D", '"_D', { noremap = true })
+vim.keymap.set("n", "x", '"_x', { noremap = true })
+vim.keymap.set("n", "X", '"_X', { noremap = true })
+vim.keymap.set("n", "s", '"_s', { noremap = true })
+vim.keymap.set("n", "S", '"_S', { noremap = true })
+
+-- Visual mode variants
+vim.keymap.set("v", "d", '"_d', { noremap = true })
+vim.keymap.set("v", "x", '"_x', { noremap = true })
+vim.keymap.set("v", "c", '"_c', { noremap = true })
+vim.keymap.set("v", "s", '"_s', { noremap = true })
+
 -- Yank+delete using <leader>
 vim.keymap.set("n", "<leader>d", "d",   { noremap = true, desc = "Delete with yank" })
 vim.keymap.set("n", "<leader>dd", "dd", { noremap = true, desc = "Delete line with yank" })
