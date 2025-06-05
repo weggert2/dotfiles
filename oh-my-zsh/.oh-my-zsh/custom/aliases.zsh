@@ -13,6 +13,13 @@ alias v="nvim"
 alias v.="nvim ."
 alias rm="rm --verbose"
 alias edz="nvim ~/.zshrc"
+alias fpg="fprime-util generate -f -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+alias fpt_="fprime-util generate --ut -f -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+alias fpt="fpt_ || fpt_"
+alias fpb1="fprime-util build"
+alias fpb="fpb1 -j$(nproc)"
+alias fpc1="fprime-util check"
+alias fpc="fpc1 -j$(nproc)"
 # alias gdb="gdb -tui --args"
 
 teeclip() {

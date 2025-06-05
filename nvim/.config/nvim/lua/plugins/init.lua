@@ -439,7 +439,7 @@ return {
                 sections = {
                     lualine_a = { 'mode' },
                     lualine_b = {},
-                    lualine_c = { 'filename' },
+                    lualine_c = {{'filename', path = 1 }},
                     lualine_x = { 'filetype' },
                     lualine_y = {
                         function()
