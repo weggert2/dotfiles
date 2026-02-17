@@ -1,5 +1,5 @@
 [user]
-    name = Bill Eggert
+	name = Bill Eggert
 
 [include]
     path = ~/.gitconfig.local
