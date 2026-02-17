@@ -161,4 +161,4 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Created by `pipx` on 2025-05-12 22:23:06
-export PATH="$PATH:/home/bill/.local/bin"
+export PATH="$PATH:/home/bill/.local/bin:/opt/nvim-linux/x86_64/bin"
